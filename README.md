@@ -1,10 +1,8 @@
 # gachi_backend
 
 ## APPs
-
 ### Authentication
-### API_Gateway
+### ImageUpload
 ### Classification
-
 
 ## PostgreSQL 

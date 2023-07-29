@@ -1,15 +1,27 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import generics
+from .models import User
+from .serializer import SignUpSerializer
 # Create your views here.
+# generics -> CRUD class
 
 class LoginView(APIView):
     def get(self,request):
+        
         return Response(status=200)
     
 class LogoutView(APIView):
     def get(self,request):
         return Response(status=200)
+    
+# generic을 사용한 유저 회원가입 뷰 
+class SignUpView(generics.CreateAPIView):
+
+    queryset = User.objects.all()
+    serializer_class = SignUpSerializer
+    
     
 class TokenObtainView(APIView):
     def post(self, request):

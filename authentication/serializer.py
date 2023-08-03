@@ -12,9 +12,8 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email','password','password_again','nickname','gender','birth','username']
+        fields = ['email','password','password_again','gender','birth','username']
         
-
     email = serializers.EmailField( 
         required = True,
         validators=[UniqueValidator(queryset=User.objects.all())] # 유효성 검사 
@@ -36,10 +35,10 @@ class SignUpSerializer(serializers.ModelSerializer):
             )
         return data
     
+    # json 데이터를 역직렬화하여 ORM에 저장 
     def create(self,validated_data):
         user = User.objects.create_user(
             email=validated_data['email'],
-            nickname = validated_data['nickname'],
             gender = validated_data['gender'],
             birth = validated_data['birth'],
             username= validated_data['username']
@@ -50,6 +49,10 @@ class SignUpSerializer(serializers.ModelSerializer):
         return user
 
 class LoginSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['email','password']
     email = serializers.CharField(required=True)
     password = serializers.CharField(required=True)
 

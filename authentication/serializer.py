@@ -1,6 +1,5 @@
 from .models import User
 from django.contrib.auth.password_validation import validate_password 
-
 #serializer tools
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
@@ -12,7 +11,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email','password','password_again','gender','birth','username']
+        fields = ['email','password','password_again','gender','birth','name','nickname']
         
     email = serializers.EmailField( 
         required = True,
@@ -23,6 +22,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         required = True,
         validators=[validate_password] 
     )
+
     password_again = serializers.CharField(
         write_only = True,
         required = True,
@@ -31,21 +31,22 @@ class SignUpSerializer(serializers.ModelSerializer):
     def validate(self,data):
         if data['password'] != data['password_again']:
             raise serializers.ValidationError(
-                {"password":"비밀번호가 일치하지 않습니다."}
+                {"password":"비밀번호와 비밀번호 확인이 일치하지 않습니다."}
             )
         return data
     
     # json 데이터를 역직렬화하여 ORM에 저장 
     def create(self,validated_data):
+        # User의 헬퍼 클래스 UserManager의 create_user 메소드 호출 
         user = User.objects.create_user(
             email=validated_data['email'],
             gender = validated_data['gender'],
             birth = validated_data['birth'],
-            username= validated_data['username']
+            name= validated_data['name'],
+            nickname = validated_data['nickname']
         )
         user.set_password(validated_data['password']) # 해싱하여 password저장 
         user.save() # 저장
-        token = Token.objects.create(user=user)
         return user
 
 class LoginSerializer(serializers.ModelSerializer):
@@ -53,12 +54,14 @@ class LoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email','password']
+
     email = serializers.CharField(required=True)
     password = serializers.CharField(required=True)
 
     # Validating
     def validate(self,data):
-        user = authenticate(**data)
+        ## 인증 model에서 해당하는 user가 존재하는지 검사 
+        user = authenticate(**data) ## data 딕셔너리를 unpacking해서 전달 
         if user:
             token = Token.objects.get(user=user) # 일치하는 유저의 토큰을 가져오기
             return token

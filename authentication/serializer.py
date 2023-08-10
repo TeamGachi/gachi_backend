@@ -2,9 +2,9 @@ from .models import User
 from django.contrib.auth.password_validation import validate_password 
 #serializer tools
 from rest_framework import serializers
-from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from rest_framework.validators import UniqueValidator
+from rest_framework_simplejwt.tokens import RefreshToken
 
 # 회원가입 시리얼라이저 클래스 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -58,13 +58,13 @@ class LoginSerializer(serializers.ModelSerializer):
     email = serializers.CharField(required=True)
     password = serializers.CharField(required=True)
 
-    # Validating
+    # email과 password검증 
     def validate(self,data):
         ## 인증 model에서 해당하는 user가 존재하는지 검사 
-        user = authenticate(**data) ## data 딕셔너리를 unpacking해서 전달 
-        if user:
-            token = Token.objects.get(user=user) # 일치하는 유저의 토큰을 가져오기
-            return token
+        user = authenticate(**data) ## data 딕셔너리를 요소별로 unpacking해서 전달 
+        if user: # 토큰 리턴 
+            refresh = RefreshToken.for_user(user)
+            return refresh
         raise serializers.ValidationError(
             {"error":"unalbe to authentication"}
         )

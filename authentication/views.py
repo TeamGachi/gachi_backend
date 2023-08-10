@@ -12,14 +12,21 @@ from django.contrib.auth import authenticate
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     def post(self,request):
-        serializer = self.get_serializer(request.data) # genericAPIview의 get_serializer를 통해 시리얼라이저 지정
-        refreshtoken = serializer.is_valid(raise_exception=True)
-        if refreshtoken is not None: # login 데이터가 유효한지 검사하기 위해 validate메소드 실행
+        serializer = self.get_serializer(data=request.data) # genericAPIview의 get_serializer를 통해 시리얼라이저 지정
+        serializer.is_valid(raise_exception=True)
+        if serializer.is_valid(raise_exception=True): # login 데이터가 유효한지 검사하기 위해 validate메소드 실행
             # validated data는 is_valid를 통해 validate를 진행한 딕셔너리 
-            return Response({
-                'refresh': str(refreshtoken),
-                'access': str(refreshtoken.access_token),
-            })
+            user = authenticate(
+                request,
+                email = serializer.validated_data['email'],
+                password = serializer.validated_data['password']
+            )
+            if user is not None:
+                refreshtoken = RefreshToken.for_user(user)    
+                return Response({
+                    'refresh': str(refreshtoken),
+                    'access': str(refreshtoken.access_token),
+                })
     
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -27,7 +27,6 @@ class LoginView(generics.GenericAPIView):
                     'refresh': str(refreshtoken),
                     'access': str(refreshtoken.access_token),
                 })
-    
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
             

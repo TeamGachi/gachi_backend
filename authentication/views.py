@@ -29,10 +29,7 @@ class LoginView(generics.GenericAPIView):
                 })
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-            
-
-            
-        
+                   
 class LogoutView(APIView):
     def get(self,request):
         return Response(status=200)

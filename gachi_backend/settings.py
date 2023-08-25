@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'authentication',
     'rest_framework_simplejwt',
-    'friend'
+    'friend',
+    'image',
+    'trip'
 ]
 
 MIDDLEWARE = [

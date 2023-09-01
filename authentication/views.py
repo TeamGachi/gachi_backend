@@ -29,7 +29,8 @@ class LoginView(generics.GenericAPIView):
                 })
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-                   
+
+# front에서 토큰 폐기              
 class LogoutView(APIView):
     def get(self,request):
         return Response(status=200)

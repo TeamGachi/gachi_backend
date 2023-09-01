@@ -11,7 +11,8 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email','password','password_again','gender','birth','name','nickname']
+        # 아래에 해당하는 튜플들만 json으로 변환 
+        fields = ['password','password_again','gender','birth','name','nickname','email']
         
     email = serializers.EmailField( 
         required = True,
@@ -35,7 +36,7 @@ class SignUpSerializer(serializers.ModelSerializer):
             )
         return data
     
-    # json 데이터를 역직렬화하여 ORM에 저장 
+    # json 데이터를 역직렬화하여 저장 
     def create(self,validated_data):
         # User의 헬퍼 클래스 UserManager의 create_user 메소드 호출 
         user = User.objects.create_user(

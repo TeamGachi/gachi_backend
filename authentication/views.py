@@ -52,7 +52,3 @@ class TokenRefreshView(APIView):
         # Refresh 토큰을 이용하여 Access 토큰을 갱신
         pass
 
-class TokenLogoutView(APIView):
-    def post(self, request):
-        # 로그아웃 로직을 구현하고 토큰을 무효화
-        pass

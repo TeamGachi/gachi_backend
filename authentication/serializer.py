@@ -12,7 +12,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         # 아래에 해당하는 튜플들만 json으로 변환 
-        fields = ['password','password_again','gender','birth','name','nickname','email']
+        fields = ['email','password','password_again','gender','birth','name']
         
     email = serializers.EmailField( 
         required = True,
@@ -44,7 +44,6 @@ class SignUpSerializer(serializers.ModelSerializer):
             gender = validated_data['gender'],
             birth = validated_data['birth'],
             name= validated_data['name'],
-            nickname = validated_data['nickname']
         )
         user.set_password(validated_data['password']) # 해싱하여 password저장 
         user.save() # 저장

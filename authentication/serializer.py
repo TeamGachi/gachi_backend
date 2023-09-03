@@ -8,15 +8,15 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 # 회원가입 시리얼라이저 클래스 
 class SignUpSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         # 아래에 해당하는 튜플들만 json으로 변환 
         fields = ['email','password','password_again','gender','birth','name']
-        
+    
+    # 유효성 검사 옵션 
     email = serializers.EmailField( 
         required = True,
-        validators=[UniqueValidator(queryset=User.objects.all())] # 유효성 검사 
+        validators=[UniqueValidator(queryset=User.objects.all())] 
     )
 
     password = serializers.CharField( 

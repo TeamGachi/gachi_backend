@@ -18,8 +18,18 @@ class UserManager(BaseUserManager):
         user.save()
         return user 
     
-    def create_superuser():
-        pass
+    def create_superuser(self,email,name="lim",gender="남자",birth="1999-08-22",password=None):
+        user = self.create_user(
+            email = self.normalize_email(email), # 이메일 정규화 
+            name = name,
+            gender = gender,
+            birth = birth
+        )
+        user.set_password(password) # 암호 난독화
+        user.is_admin = True
+        user.is_staff = True
+        user.save()
+        return user
 
 class User(AbstractBaseUser):
     # id와 password만 AbstractBaseUser에 존재 
@@ -30,6 +40,15 @@ class User(AbstractBaseUser):
     # AbstractUser 필수 필드 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
+    @property
+    def is_staff(self):
+        return self.is_admin
     # CustomUser 매니저 클래스 지정 
     objects = UserManager() 
     # username filed 지정 

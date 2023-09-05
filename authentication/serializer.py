@@ -46,7 +46,7 @@ class SignUpSerializer(serializers.ModelSerializer):
             name= validated_data['name'],
         )
         user.set_password(validated_data['password']) # 해싱하여 password저장 
-        user.save() # 저장
+        user.save() 
         return user
 
 class LoginSerializer(serializers.ModelSerializer):
@@ -61,7 +61,6 @@ class LoginSerializer(serializers.ModelSerializer):
     # email과 password검증 
     def validate(self,data):
         ## 인증 model에서 해당하는 user가 존재하는지 검사 
-        
         if len(data['password'])>=6 and len(data['password'])<=20 : # 비밀번호 길이검사
             return data # 검증완료한 데이터 반환 -> validated_data 딕셔너리가 됨 
         raise serializers.ValidationError(

@@ -9,28 +9,49 @@ from .serializer import FriendSerializer,FriendshipRequestSerializer
 from authentication.models import User
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-# 친구 목록 조회
+# 친구 목록 조회 Create
 class FriendView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self,request):
         user = request.user
-        return Response({"user_id":user.id,"email":user.name})
-    def post(self,request):
+        email_list = []
+        # User Friend list
         try:
-            token = Token(str(request.data.get('token')))
+            friends = Friend.objects.filter(from_user = user)
+            for friend in friends:
+                friend_email = friend.to_user.email
+                email_list.append(friend_email)
         except Exception as e:
-            raise Exception("Invalid Token")
-        return token
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        print(email_list)
+        return Response({"user_id":user.id,"email":user.name})
+
+        
     
-# 친구 요청 CREATE 
-class FriendRequestView(APIView):
+# 친구요청 Create Read
+class FriendshipRequestView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        user = request.user
+        email_list = []
+        try:
+            friendship_requests = FriendshipRequest.objects.filter(to_user = user)
+            for friendship_request in friendship_requests:
+                from_user_email = friendship_request.from_user.email
+                email_list.append(from_user_email)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        print(email_list)
+        return Response({"user_id":user.id,"email":user.name})
+    
     def post(self,request):
         serializer = FriendshipRequestSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=False)  # Trigger Bad Request if errors exist
+        serializer.save(user=request.user)         # Passing the current user
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
          
 # 친구 요청 승낙 
 class FriendRequestAcceptView(APIView):

@@ -3,7 +3,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import Token
-from rest_framework import status
+from rest_framework import status,generics
 from .models import Friend,FriendshipRequest
 from .serializer import FriendSerializer,FriendshipRequestSerializer
 from authentication.models import User
@@ -30,10 +30,11 @@ class FriendView(APIView):
 
         
     
-# 친구요청 Create Read
-class FriendshipRequestView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+# 친구요청 Create/Read
+class FriendshipRequestView(generics.GenericAPIView):
+    """ authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated] """
+    serializer_class = FriendshipRequestSerializer
     def get(self,request):
         user = request.user
         email_list = []
@@ -44,14 +45,16 @@ class FriendshipRequestView(APIView):
                 email_list.append(from_user_email)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        print(email_list)
         return Response({"user_id":user.id,"email":user.name})
     
     def post(self,request):
-        serializer = FriendshipRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=False)  # Trigger Bad Request if errors exist
-        serializer.save(user=request.user)         # Passing the current user
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer = self.get_serializer(data=request.data) # genericAPIview의 get_serializer를 통해 시리얼라이저 지정
+        if serializer.is_valid(raise_exception=True): # login 데이터가 유효한지 검사하기 위해 validate메소드 실행
+            print("d")
+           
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_201_CREATED)
          
 # 친구 요청 승낙 
 class FriendRequestAcceptView(APIView):

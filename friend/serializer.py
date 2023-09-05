@@ -12,18 +12,18 @@ class FriendSerializer(ModelSerializer):
 class FriendshipRequestSerializer(ModelSerializer):
     class Meta:
         model = FriendshipRequest
-        fields = "__all__"
+        fields = ["from_user","to_user"]
 
     def validate(self, data):
-        if User.objects.get(email=data['from_email']) and User.objects.get(email=data['to_email']):
+        if User.objects.get(email=data['from_user']) and User.objects.get(email=data['to_user']):
             return data
         return serializers.ValidationError(
             {"error":"unalbe to find users"}
         )
 
     def create(self, validated_data):
-        from_user = User.objects.get(email=validated_data['from_email'])
-        to_user = User.objects.get(email=validated_data['to_email'])
+        from_user = self.context['request'].user
+        to_user = User.objects.get(email=validated_data['request_to'])
         friendship = FriendshipRequest.objects.create(
             from_user = from_user,
             to_user = to_user

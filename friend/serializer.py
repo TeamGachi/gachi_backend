@@ -28,7 +28,7 @@ class FriendshipRequestSerializer(ModelSerializer):
             from_user = from_user,
             to_user = to_user
         )
-        friendship.save() # 저장
+        friendship.save() 
         return friendship
 
     

@@ -5,6 +5,7 @@ from rest_framework import generics,status
 from .models import User
 from .serializer import SignUpSerializer,LoginSerializer
 from django.contrib.auth import authenticate
+import requests
 # Create your views here.
 # generics -> CRUD 뷰
 # GenericAPI view의 attribute로 시리얼라이저 클래스를 가지고 있고 기본 시리얼라이저로 지정함 
@@ -13,10 +14,9 @@ class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     def post(self,request):
         serializer = self.get_serializer(data=request.data) # genericAPIview의 get_serializer를 통해 시리얼라이저 지정
-        serializer.is_valid(raise_exception=True)
         if serializer.is_valid(raise_exception=True): # login 데이터가 유효한지 검사하기 위해 validate메소드 실행
             # validated data는 is_valid를 통해 validate를 진행한 딕셔너리 
-            user = authenticate(
+            user = authenticate( # basic authentication model을 활용하여 인증 
                 request,
                 email = serializer.validated_data['email'],
                 password = serializer.validated_data['password']
@@ -29,6 +29,22 @@ class LoginView(generics.GenericAPIView):
                 })
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+# 카카오 로그인 API 
+class KakaoLoginView(APIView):
+    kakao_auth_rul = KAKAO_AUTH
+    def get(self,request):
+        '''
+        카카오 코드 요청
+        '''
+        client_id = KAKAO_CONFIG['KAKAO_REST_API_KEY']
+        redirect_uri = KAKAO_CONFIG['KAKAO_REDIRECT_URI']
+
+        uri = f"{kakao_login_uri}?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
+        
+        res = redirect(uri)
+        return res
+
 
 # front에서 토큰 폐기              
 class LogoutView(APIView):

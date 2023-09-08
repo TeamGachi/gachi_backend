@@ -5,7 +5,7 @@ from rest_framework import generics,status
 from .models import User
 from .serializer import SignUpSerializer,LoginSerializer
 from django.contrib.auth import authenticate
-import requests
+from config import KAKAO
 # Create your views here.
 # generics -> CRUD 뷰
 # GenericAPI view의 attribute로 시리얼라이저 클래스를 가지고 있고 기본 시리얼라이저로 지정함 
@@ -32,18 +32,26 @@ class LoginView(generics.GenericAPIView):
         
 # 카카오 로그인 API 
 class KakaoLoginView(APIView):
-    kakao_auth_rul = KAKAO_AUTH
+    kakao_login_uri = ""
     def get(self,request):
         '''
         카카오 코드 요청
         '''
-        client_id = KAKAO_CONFIG['KAKAO_REST_API_KEY']
-        redirect_uri = KAKAO_CONFIG['KAKAO_REDIRECT_URI']
+        client_id = KAKAO['KAKAO_REST_API_KEY']
+        redirect_uri = KAKAO['KAKAO_REDIRECT_URI']
 
         uri = f"{kakao_login_uri}?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
         
         res = redirect(uri)
         return res
+
+# Kakao Authentication 완료시 Redirection View 
+class KakaoLoginCallbackView(APIView):
+    '''
+        신규가입시 : DB push 및 정보생성
+        기존회원 : 토큰 발급 -> 공통함수, 뭉치자
+    '''
+    pass 
 
 
 # front에서 토큰 폐기              
@@ -56,7 +64,8 @@ class SignUpView(generics.CreateAPIView):
     queryset = User.objects.all()
     #SignUpView의 시리얼라이저를 지정 
     serializer_class = SignUpSerializer
-    
+
+'''  
 class TokenObtainView(APIView):
     def post(self, request):
         # 로그인 로직을 구현하고 인증이 성공한 경우 토큰을 발급
@@ -67,4 +76,4 @@ class TokenRefreshView(APIView):
     def post(self, request):
         # Refresh 토큰을 이용하여 Access 토큰을 갱신
         pass
-
+'''

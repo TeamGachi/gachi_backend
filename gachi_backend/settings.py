@@ -12,13 +12,13 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import datetime
-from config import env
+from config import ENV
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = env['SECRETKEY']
+SECRET_KEY = ENV['SECRETKEY']
 
 DEBUG = True
 

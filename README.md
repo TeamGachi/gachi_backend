@@ -1,5 +1,6 @@
-# gachi_backend
+# 가치 백엔드 리포지토리
 Trip together , Share images easily ! 
+
 인공지능 기반 여행 어플리케이션 GACHI입니다.
 
 # Stack

@@ -7,12 +7,12 @@ from authentication.models import User
 class FriendSerializer(ModelSerializer):
     class Meta:
         model  = Friend
-        fields = ["to_user"]
+        fields = "__all__"
 
 class FriendshipRequestSerializer(ModelSerializer):
     class Meta:
         model = FriendshipRequest
-        fields = ["from_user","to_user"]
+        fields = "__all__"
 
     def validate(self, data):
         if User.objects.get(email=data['from_user']) and User.objects.get(email=data['to_user']):

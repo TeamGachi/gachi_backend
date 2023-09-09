@@ -11,48 +11,48 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # 친구 목록 조회 Create
 class FriendView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication] # 요청자 식별 
+    permission_classes = [IsAuthenticated] # API 요청 권한 식별 
     def get(self,request):
         user = request.user
-        email_list = []
-        # User Friend list
         try:
-            friends = Friend.objects.filter(from_user = user)
-            for friend in friends:
-                friend_email = friend.to_user.email
-                email_list.append(friend_email)
-        except Exception as e:
-            print(e)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        print(email_list)
-        return Response({"user_id":user.id,"email":user.name})
-
-        
-    
-# 친구요청 Create/Read
-class FriendshipRequestView(generics.GenericAPIView):
-    """ authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated] """
-    serializer_class = FriendshipRequestSerializer
-    def get(self,request):
-        user = request.user
-        email_list = []
-        try:
-            friendship_requests = FriendshipRequest.objects.filter(to_user = user)
-            for friendship_request in friendship_requests:
-                from_user_email = friendship_request.from_user.email
-                email_list.append(from_user_email)
+            queryset = Friend.objects.filter(from_user = user)
+            serializer = FriendSerializer(queryset,many=True)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response({"user_id":user.id,"email":user.name})
+        return Response(serializer.data)
+
+# 친구요청 Create/Read
+class FriendshipRequestView(generics.ListCreateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated] 
+
+    serializer_class = FriendshipRequestSerializer
+    queryset = FriendshipRequest.objects.all()
+
+    def get(self,request):
+        '''
+            User가 요청받은 FriendshipRequest조회 
+        '''
+        user = request.user
+        try:
+            queryset = FriendshipRequest.objects.filter(to_user = user)
+            serializer = FriendshipRequestSerializer(queryset,many=True)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data)
     
     def post(self,request):
-        serializer = self.get_serializer(data=request.data) # genericAPIview의 get_serializer를 통해 시리얼라이저 지정
-        if serializer.is_valid(raise_exception=True): # login 데이터가 유효한지 검사하기 위해 validate메소드 실행
-            print("d")
-           
-        else:
+        '''
+            Friendship 요청 
+        '''
+        from_user = request.user
+        to_user_email = request.data.get('to_email')
+        to_user = User.objects.get(email=to_user_email)
+        try:
+            friendship = FriendshipRequest.objects.create(from_user = from_user , to_user = to_user)
+            friendship.save()
+        except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_201_CREATED)
          

@@ -37,9 +37,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
-    # drf yasg
-    'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
-    'drf_yasg',
     # my apps 
     'authentication',
     'friend',

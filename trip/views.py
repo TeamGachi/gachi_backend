@@ -1,16 +1,10 @@
-
 from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
-from authentication.models import User
-from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .permissions import TripMembersOnly
 from .serializer import TripSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .models import TripList
-
-import json
 
 # 여행 생성 및 조회 
 class TripView(APIView):

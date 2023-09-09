@@ -33,7 +33,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     # id와 password만 AbstractBaseUser에 존재 
-    email = models.CharField(unique=True, max_length=50) 
+    email = models.CharField(primary_key=True, max_length=50) 
     name = models.CharField(max_length=50)
     birth = models.DateField()
     gender = models.CharField(max_length=20)
@@ -45,9 +45,6 @@ class User(AbstractBaseUser):
         return True
     def has_module_perms(self, app_label):
         return True
-    @property
-    def is_staff(self):
-        return self.is_admin
     # CustomUser 매니저 클래스 지정 
     objects = UserManager() 
     # username filed 지정 

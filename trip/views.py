@@ -14,27 +14,28 @@ class TripView(APIView):
     permission_classes = [IsAuthenticated]
     ''' 
         자신이 속한 여행 조회
-        { 
-            'place' , 'department' , 'arrival' 
-        }
     '''
     def get(self, request):
-        return "hi"
+        pass
     
     ''' 
-        Generating Trip session  
+        Trip session 생성 
     '''
     def post(self, request):
-        data = {
-            "place": json.loads(request.data.get("place")),
-            "department": json.loads(request.data.get("departing_date")),
-            "arrival": json.loads(request.data.get("arriving_date")),
-        }
-        return "d"
+        pass
 
 
-
-''' 특정 Trip에 대한 detail 정보 반환 '''
 class TripDetailView(APIView):
-    pass
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        '''
+            특정 여행에 대한 Detail 정보 반환 
+        '''
+        pass
+    def post(self,request):
+        '''
+            특정 여행에 대한 Detail 정보 수정 
+        '''
+        pass
   

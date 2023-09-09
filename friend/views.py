@@ -1,9 +1,7 @@
 from rest_framework.views import APIView
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import Token
-from rest_framework import status,generics
+from rest_framework import status
 from .models import Friend,FriendshipRequest
 from .serializer import FriendSerializer,FriendshipRequestSerializer
 from authentication.models import User
@@ -23,7 +21,7 @@ class FriendView(APIView):
         return Response(serializer.data)
 
 # 친구요청 Create/Read
-class FriendshipRequestView(generics.ListCreateAPIView):
+class FriendshipRequestView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
 
@@ -32,7 +30,7 @@ class FriendshipRequestView(generics.ListCreateAPIView):
 
     def get(self,request):
         '''
-            User가 요청받은 FriendshipRequest조회 
+            요청받은 FriendshipRequest조회 
         '''
         user = request.user
         try:
@@ -58,6 +56,26 @@ class FriendshipRequestView(generics.ListCreateAPIView):
          
 # 친구 요청 승낙 
 class FriendRequestAcceptView(APIView):
-    pass
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated] 
+    def post(self,request):
+        '''
+            요청받은 친구요청 승낙 
+        '''
+        user = request.user
+        friendship_request_id = request.data.get('id')
+        try:
+            friendship_request = FriendshipRequest.objects.get(id=friendship_request_id)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        from_user_email = friendship_request.from_user # 친구 요청을 보낸 이메일
+        from_user = User.objects.get(email=from_user_email)
+        # a to b && b to a 
+        friendship1 = Friend(from_user=user , to_user = from_user)
+        friendship1.save()
+        friendship2 = Friend(from_user=from_user , to_user = user)
+        friendship2.save()
+        return Response(status=status.HTTP_200_OK)
+
 
 

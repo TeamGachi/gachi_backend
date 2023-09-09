@@ -65,15 +65,4 @@ class SignUpView(generics.CreateAPIView):
     #SignUpView의 시리얼라이저를 지정 
     serializer_class = SignUpSerializer
 
-'''  
-class TokenObtainView(APIView):
-    def post(self, request):
-        # 로그인 로직을 구현하고 인증이 성공한 경우 토큰을 발급
-        # Refresh 토큰과 Access 토큰을 생성
-        pass
 
-class TokenRefreshView(APIView):
-    def post(self, request):
-        # Refresh 토큰을 이용하여 Access 토큰을 갱신
-        pass
-'''

@@ -20,7 +20,7 @@ class FriendView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data)
 
-# 친구요청 Create/Read
+# 친구요청 및 조회 
 class FriendshipRequestView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
@@ -41,11 +41,11 @@ class FriendshipRequestView(APIView):
         '''
             Friendship 요청 
         '''
-        from_user = request.user
+        user = request.user
         to_user_email = request.data.get('to_email')
-        to_user = User.objects.get(email=to_user_email)
         try:
-            friendship = FriendshipRequest.objects.create(from_user = from_user , to_user = to_user)
+            to_user = User.objects.get(email=to_user_email)
+            friendship = FriendshipRequest.objects.create(from_user = user , to_user = to_user)
             friendship.save()
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)

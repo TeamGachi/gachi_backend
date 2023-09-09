@@ -3,7 +3,7 @@ from rest_framework.exceptions import PermissionDenied, NotAuthenticated
 from django.shortcuts import get_object_or_404
 from authentication.models import User
 
-
+# Trip 멤버만이 접근할 수 있음 
 class TripMembersOnly(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated

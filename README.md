@@ -12,4 +12,7 @@ Trip together , Share images easily !
   <img src="https://img.shields.io/badge/fastapi-009688?style=for-the-badge&logo=fastapi&logoColor=white">
 </p>
 
+# Architecture
+![image](https://github.com/TeamGachi/gachi_backend/assets/81519350/a6d17bca-2f75-4229-ad55-cc2b7556aa9a)
+
 

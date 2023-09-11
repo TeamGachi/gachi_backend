@@ -1,7 +1,10 @@
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 from .models import Trip
 
-class TripSerializer(serializers.ModelSerializer):
+class TripSerializer(ModelSerializer):
+    class meta:
+        model = Trip
+        fields = "__all__"
     # 일치하는 jwt를 가지고 있는지 검사 
     def validate(self, data):
         pass

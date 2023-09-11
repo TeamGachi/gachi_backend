@@ -34,7 +34,3 @@ class TripView(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-''' 특정 Trip에 대한 detail 정보 반환 '''
-class TripDetailView(APIView):
-    pass
-  

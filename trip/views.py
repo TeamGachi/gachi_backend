@@ -16,8 +16,7 @@ class TripView(APIView):
         '''
         user = request.user
         queryset = TripList.objects.filter(member=user)
-        trips = [query.trip for query in queryset] # User가 속한 모든 Trip의 list 
-        serialzier = TripSerializer(trips,many=True) # 모든 쿼리셋을 직렬화 
+        serialzier = TripListSerializer(queryset,many=True) # 모든 쿼리셋을 직렬화 
         return Response(serialzier.data)
     
     def post(self, request):
@@ -36,4 +35,11 @@ class TripView(APIView):
 # 특정 여행 세부 정보 조회 
 class TripDetailView(APIView):
     def get(self,request,pk):
-        pass
+        try:
+            trip_list = TripList.objects.get(id=pk)
+            trip = Trip.objects.get(id=trip_list.trip)
+            serializer = TripSerializer(trip)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(data=serializer.data,status=status.HTTP_200_OK)
+

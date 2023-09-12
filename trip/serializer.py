@@ -1,11 +1,11 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Trip
+from .models import Trip,TripList
 
 class TripSerializer(ModelSerializer):
-    class meta:
+    class Meta:
         model = Trip
         fields = "__all__"
-    # 일치하는 jwt를 가지고 있는지 검사 
+    
     def validate(self, data):
         pass
     
@@ -17,7 +17,12 @@ class TripSerializer(ModelSerializer):
         )
         return trip
     
+class TripListSerializer(ModelSerializer):
+    class Meta:
+        model = TripList
+        fields = "__all__"
 
+    
 
 
 

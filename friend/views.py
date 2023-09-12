@@ -25,9 +25,6 @@ class FriendshipRequestView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
 
-    serializer_class = FriendshipRequestSerializer
-    queryset = FriendshipRequest.objects.all()
-
     def get(self,request):
         '''
             요청받은 FriendshipRequest조회 

@@ -12,16 +12,16 @@ class TripView(APIView):
     permission_classes = [TripMembersOnly]
     def get(self, request):
         ''' 
-            자신이 속한 Trip 조회
+            자신이 속한 Trip조회
         '''
         user = request.user
         queryset = TripList.objects.filter(member=user)
-        serialzier = TripListSerializer(queryset,many=True) # 모든 쿼리셋을 직렬화 
+        serialzier = TripListSerializer(queryset,many=True) 
         return Response(serialzier.data)
     
     def post(self, request):
         ''' 
-            Trip 생성 
+            새로운 Trip 생성 
         '''
         serializer = TripSerializer(data = request.data)
         if serializer.is_valid(): # trip member추가 
@@ -32,8 +32,31 @@ class TripView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_201_CREATED)
 
-# 특정 여행 세부 정보 조회 
+    def delete(self,request):
+        '''
+            특정 Trip 삭제 
+        '''
+        pass
+
+
+# TripList 조회
+class TripListView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [TripMembersOnly]
+    def get(self,request):
+        pass
+    
+    def delete(self,request):
+        '''
+            특정 TripList에서 User가 포함된 튜플 삭제
+        '''
+
+
+
+# 특정 여행 세부사항 조회 
 class TripDetailView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [TripMembersOnly]
     def get(self,request,pk):
         try:
             trip_list = TripList.objects.get(id=pk)

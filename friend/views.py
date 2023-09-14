@@ -22,12 +22,15 @@ class FriendView(APIView):
 
 # 친구요청 및 조회 
 class FriendshipRequestView(APIView):
+    '''
+        /request/
+    '''
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
 
     def get(self,request):
         '''
-            요청받은 FriendshipRequest조회 
+            User가 요청받은 FriendshipRequest조회 
         '''
         user = request.user
         queryset = FriendshipRequest.objects.filter(to_user = user)
@@ -36,11 +39,11 @@ class FriendshipRequestView(APIView):
     
     def post(self,request):
         '''
-            Friendship 요청 
+            User가 to_user_email에게 FriendshipRequest 요청 
         '''
         user = request.user
-        to_user_email = request.data.get('to_email')
         try:
+            to_user_email = request.data.get('to_email')
             to_user = User.objects.get(email=to_user_email)
             friendship = FriendshipRequest.objects.create(from_user = user , to_user = to_user)
             friendship.save()

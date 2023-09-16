@@ -24,7 +24,7 @@ class TripView(APIView):
             새로운 Trip 생성 
         '''
         serializer = TripSerializer(data = request.data)
-        if serializer.is_valid(): # trip member추가 
+        if serializer.is_valid(): 
             serializer.save()
             triplist = TripList.objects.create(trip=serializer.id,member=request.user)
             triplist.save()

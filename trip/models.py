@@ -7,11 +7,5 @@ class Trip(models.Model):
     place = models.CharField(max_length=50)
     departing_date = models.DateField(default=localdate)
     arriving_date = models.DateField(default=localdate)
+    users = models.ManyToManyField(User)
 
-# Trip list 
-class TripList(models.Model):
-    '''
-        User가 속한 Trip
-    '''
-    member = models.ForeignKey(User,on_delete=models.CASCADE)
-    trip = models.ForeignKey(Trip,on_delete=models.CASCADE)

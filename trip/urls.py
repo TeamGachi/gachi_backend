@@ -4,6 +4,6 @@ from .views import *
 app_name = 'trip'
 
 urlpatterns = [
-    path('informations/', TripView.as_view()),
-    path('detail/<int:pk>/',TripDetailView.as_view())
+    path('', TripView.as_view()),
+    path('<int:pk>/',TripDetailView.as_view())
 ]

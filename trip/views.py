@@ -37,10 +37,12 @@ class TripView(APIView):
         '''
         pass
 
-# 특정 여행 세부사항 조회 
+# 특정 여행 조회 및 삭제
 class TripDetailView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [TripMembersOnly]
     def get(self,request,pk):
+        pass
+    def delete(self,request,pk):
         pass
 

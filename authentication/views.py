@@ -5,7 +5,7 @@ from rest_framework import generics,status
 from .models import User
 from .serializer import SignUpSerializer,LoginSerializer
 from django.contrib.auth import authenticate
-from config import KAKAO
+from config import *
 from django.shortcuts import redirect
 import requests
 # GenericAPI view의 attribute로 시리얼라이저 클래스를 가지고 있고 기본 시리얼라이저로 지정함 
@@ -63,16 +63,15 @@ class KakaoLoginCallbackView(APIView):
         }
         user_information = requests.get(kakao_inforamtion_api,headers=header).json()
         ## 신규회원이면 회원가입 및 회원이면 로그인 로직 
-
+        
         return Response(data={"hd":"dff"},status=status.HTTP_200_OK)
 
-
-# front에서 토큰 폐기              
+# 로그아웃      
 class LogoutView(APIView):
     def get(self,request):
         return Response(status=200)
     
-# generic API를 상속 및 사용한 유저 회원가입 뷰 
+# 회원가입 
 class SignUpView(generics.CreateAPIView):
     queryset = User.objects.all()
     #SignUpView의 시리얼라이저를 지정 

@@ -6,6 +6,7 @@ from .models import Friend,FriendshipRequest
 from .serializer import FriendSerializer,FriendshipRequestSerializer
 from authentication.models import User
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.shortcuts import get_object_or_404
 
 # 친구 목록 조회 Create
 class FriendView(APIView):
@@ -49,25 +50,22 @@ class FriendshipRequestView(APIView):
         return Response(status=status.HTTP_201_CREATED)
          
 # 친구 요청 승낙 
-class FriendRequestAcceptView(APIView):
+class FriendshipRequestAcceptView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
-    def post(self,request):
+    def post(self,request,pk):
         '''
             친구요청 승낙 
         '''
+        friendship_request = get_object_or_404(FriendshipRequest,id=pk)
         user = request.user
-        friendship_request_id = request.data.get('id')
-        try:
-            friendship_request = FriendshipRequest.objects.get(id=friendship_request_id)
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        from_user_email = friendship_request.from_user 
+        from_user_email = friendship_request.from_user
         from_user = User.objects.get(email=from_user_email)
         friendship1 = Friend(from_user=user , to_user = from_user)
         friendship1.save()
         friendship2 = Friend(from_user=from_user , to_user = user)
         friendship2.save()
+        friendship_request.delete()
         return Response(status=status.HTTP_200_OK)
 
 

@@ -7,5 +7,5 @@ class Trip(models.Model):
     place = models.CharField(max_length=50)
     departing_date = models.DateField(default=localdate)
     arriving_date = models.DateField(default=localdate)
-    members = models.ManyToManyField(User)
+    users = models.ManyToManyField(User)
 

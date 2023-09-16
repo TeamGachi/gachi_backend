@@ -7,8 +7,7 @@ from .serializer import SignUpSerializer,LoginSerializer
 from django.contrib.auth import authenticate
 from config import KAKAO
 from django.shortcuts import redirect
-# Create your views here.
-# generics -> CRUD 뷰
+import requests
 # GenericAPI view의 attribute로 시리얼라이저 클래스를 가지고 있고 기본 시리얼라이저로 지정함 
 
 class LoginView(generics.GenericAPIView):
@@ -35,7 +34,7 @@ class LoginView(generics.GenericAPIView):
 class KakaoLoginView(APIView):
     def get(self,request):
         '''
-        카카오 코드 요청
+        카카오 인가코드 요청
         '''
         kakao_login_uri = "https://kauth.kakao.com/oauth/authorize"
         client_id = KAKAO["REST_API_KEY"]
@@ -44,16 +43,27 @@ class KakaoLoginView(APIView):
         res = redirect(uri)
         return res
 
-# Kakao Authentication 완료시 Redirection View 
+# Kakao Authentication Redirection View , 인가 token 발급 요청 
 class KakaoLoginCallbackView(APIView):
-    '''
-        신규가입시 : DB push 및 정보생성
-        기존회원 : 토큰 발급 
-        Code를 받고 리다이렉션됨 
-    '''
-    def get_queryset(self):
-        search_text = self.request.GET.get('code')
     def get(self,request):
+        '''
+        카카오 인가코드로 access token 요청 
+        '''
+        data = {
+            "grant_type" : "authorization_code",
+            "cliend_id" : KAKAO["REST_API_KEY"],
+            "redirection_uri" : "http://localhost:8000/api/authentication/login/kakao/callback/",
+            "code" : request.GET["code"]
+        }
+        kakao_token_api = "https://kauth.kakao.com/oauth/token"
+        access_token = requests.post(kakao_token_api,data=data).json()["access_token"]
+        kakao_inforamtion_api = "https://kapi.kakao.com/v2/user/me"
+        header = {
+            "Authorization" : f"Bearer ${access_token}"
+        }
+        user_information = requests.get(kakao_inforamtion_api,headers=header).json()
+        ## 신규회원이면 회원가입 및 회원이면 로그인 로직 
+
         return Response(data={"hd":"dff"},status=status.HTTP_200_OK)
 
 

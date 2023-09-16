@@ -22,9 +22,6 @@ class FriendView(APIView):
 
 # 친구요청 및 조회 
 class FriendshipRequestView(APIView):
-    '''
-        /request/
-    '''
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
 
@@ -57,7 +54,7 @@ class FriendRequestAcceptView(APIView):
     permission_classes = [IsAuthenticated] 
     def post(self,request):
         '''
-            요청받은 친구요청 승낙 
+            친구요청 승낙 
         '''
         user = request.user
         friendship_request_id = request.data.get('id')
@@ -65,9 +62,8 @@ class FriendRequestAcceptView(APIView):
             friendship_request = FriendshipRequest.objects.get(id=friendship_request_id)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        from_user_email = friendship_request.from_user # 친구 요청을 보낸 이메일
+        from_user_email = friendship_request.from_user 
         from_user = User.objects.get(email=from_user_email)
-        # a to b && b to a 
         friendship1 = Friend(from_user=user , to_user = from_user)
         friendship1.save()
         friendship2 = Friend(from_user=from_user , to_user = user)

@@ -10,10 +10,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        # 아래에 해당하는 튜플들만 json으로 변환 
-        fields = ['email','password','password_again','gender','birth','name']
-    
-    # 유효성 검사 옵션 
+        fields =["email","password","password_again","name","birth","gender"]
+
+
     email = serializers.EmailField( 
         required = True,
         validators=[UniqueValidator(queryset=User.objects.all())] 

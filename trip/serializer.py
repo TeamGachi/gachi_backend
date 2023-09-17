@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Trip,TripList
+from .models import Trip
 
 class TripSerializer(ModelSerializer):
     class Meta:
@@ -17,10 +17,6 @@ class TripSerializer(ModelSerializer):
         )
         return trip
     
-class TripListSerializer(ModelSerializer):
-    class Meta:
-        model = TripList
-        fields = "__all__"
 
     
 

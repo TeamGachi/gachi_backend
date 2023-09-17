@@ -8,7 +8,6 @@ from authentication.models import User
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
 
-# 친구 목록 조회 Create
 class FriendView(APIView):
     authentication_classes = [JWTAuthentication] # 요청자 식별 
     permission_classes = [IsAuthenticated] # API 요청 권한 식별 
@@ -48,9 +47,9 @@ class FriendshipRequestView(APIView):
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_201_CREATED)
-         
+    
 # 친구 요청 승낙 
-class FriendshipRequestAcceptView(APIView):
+class FriendshipRequestHandleView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
     def post(self,request,pk):
@@ -67,6 +66,12 @@ class FriendshipRequestAcceptView(APIView):
         friendship2.save()
         friendship_request.delete()
         return Response(status=status.HTTP_200_OK)
-
+    def delete(self,request,pk):
+        friendship = FriendshipRequest.objects.get(id=pk)
+        try:
+            friendship.delete()
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_200_OK)
 
 

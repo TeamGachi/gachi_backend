@@ -35,7 +35,7 @@ class SignUpSerializer(serializers.ModelSerializer):
             )
         return data
     
-    # json 데이터를 역직렬화하여 저장 
+  
     def create(self,validated_data):
         # User의 헬퍼 클래스 UserManager의 create_user 메소드 호출 
         user = User.objects.create_user(

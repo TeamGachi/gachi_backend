@@ -5,5 +5,5 @@ app_name = 'trip'
 
 urlpatterns = [
     path('', TripView.as_view()),
-    path('<int:pk>/',TripDetailView.as_view())
+    path('<int:pk>/',TripView.as_view())
 ]

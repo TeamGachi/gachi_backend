@@ -30,18 +30,14 @@ class TripView(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_201_CREATED)
-
-
     
-# 특정 여행 조회 및 삭제
-class TripDetailView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [TripMembersOnly]
-    def get(self,request,pk):
-        pass
     def delete(self,request,pk):
         trip = Trip.objects.get(id=pk)
         trip.users.remove(request.user)
         return Response(status=status.HTTP_200_OK)
+
+
+    
+
 
 

@@ -10,9 +10,10 @@ from django.shortcuts import get_object_or_404
 
 # 친구 R
 class FriendView(generics.ListAPIView):
-    authentication_classes = [JWTAuthentication] # 요청자 식별 
-    permission_classes = [IsAuthenticated] # API 요청 권한 식별 
+    authentication_classes = [JWTAuthentication] 
+    permission_classes = [IsAuthenticated] 
     serializer_class = FriendSerializer
+    
     def get_queryset(self):
         user = self.request.user
         queryset = Friend.objects.filter(user = user)
@@ -28,7 +29,7 @@ class FriendshipRequestView(generics.ListCreateAPIView):
         user = self.request.user
         queryset = FriendshipRequest.objects.filter(receiver=user)
         return queryset
-    # create와 list를 오버라이드 
+
     def list(self,request):
         queryset = self.get_queryset()
         serialzier = FriendshipRequestSerializer(queryset,many=True)
@@ -39,29 +40,27 @@ class FriendshipRequestView(generics.ListCreateAPIView):
 class FriendshipRequestHandleView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
+
     def post(self,request,pk):
         '''
             친구요청 승낙 
         '''
         friendship_request = get_object_or_404(FriendshipRequest,id=pk)
-        user = request.user
-        from_user_email = friendship_request.from_user
-        from_user = User.objects.get(email=from_user_email)
-        friendship1 = Friend(from_user=user , to_user = from_user)
+        sender = friendship_request.sender
+        recevier = request.user
+        friendship1 = Friend(user=sender , friend = recevier)
         friendship1.save()
-        friendship2 = Friend(from_user=from_user , to_user = user)
+        friendship2 = Friend(user=recevier , friend = sender)
         friendship2.save()
         friendship_request.delete()
         return Response(status=status.HTTP_200_OK)
+    
     def delete(self,request,pk):
         '''
             친구요청 거부 
         '''
-        friendship = FriendshipRequest.objects.get(id=pk)
-        try:
-            friendship.delete()
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_200_OK)
+        friendship = get_object_or_404(FriendshipRequest,id=pk)
+        friendship.delete()
+        return Response(status=status.HTTP_20)
 
 

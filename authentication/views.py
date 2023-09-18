@@ -64,7 +64,8 @@ class KakaoLoginCallbackView(APIView):
         user_information = requests.get(kakao_inforamtion_api,headers=header).json()
         ## 신규회원이면 회원가입 및 회원이면 로그인 로직 
         
-        return Response(data={"hd":"dff"},status=status.HTTP_200_OK)
+        ##
+        return Response(status=status.HTTP_200_OK)
 
 # 로그아웃      
 class LogoutView(APIView):

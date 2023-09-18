@@ -1,24 +1,20 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status,generics
 from .models import Friend,FriendshipRequest
 from .serializer import FriendSerializer,FriendshipRequestSerializer
 from authentication.models import User
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
 
-class FriendView(APIView):
+class FriendView(generics.ListAPIView):
     authentication_classes = [JWTAuthentication] # 요청자 식별 
     permission_classes = [IsAuthenticated] # API 요청 권한 식별 
-    def get(self,request):
-        user = request.user
-        try:
-            queryset = Friend.objects.filter(from_user = user)
-            serializer = FriendSerializer(queryset,many=True)
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.data)
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Friend.objects.filter(from_user = user)
+        return queryset
 
 # 친구요청 및 조회 
 class FriendshipRequestView(APIView):
@@ -67,6 +63,9 @@ class FriendshipRequestHandleView(APIView):
         friendship_request.delete()
         return Response(status=status.HTTP_200_OK)
     def delete(self,request,pk):
+        '''
+            친구요청 거부 
+        '''
         friendship = FriendshipRequest.objects.get(id=pk)
         try:
             friendship.delete()

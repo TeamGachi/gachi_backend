@@ -8,43 +8,34 @@ from authentication.models import User
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
 
+# 친구 R
 class FriendView(generics.ListAPIView):
     authentication_classes = [JWTAuthentication] # 요청자 식별 
     permission_classes = [IsAuthenticated] # API 요청 권한 식별 
+    serializer_class = FriendSerializer
     def get_queryset(self):
         user = self.request.user
-        queryset = Friend.objects.filter(from_user = user)
+        queryset = Friend.objects.filter(user = user)
         return queryset
 
-# 친구요청 및 조회 
-class FriendshipRequestView(APIView):
+# 친구요청 CR
+class FriendshipRequestView(generics.ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
+    serializer_class = FriendshipRequestSerializer
 
-    def get(self,request):
-        '''
-            User가 요청받은 FriendshipRequest조회 
-        '''
-        user = request.user
-        queryset = FriendshipRequest.objects.filter(to_user = user)
-        serializer = FriendshipRequestSerializer(queryset,many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        user = self.request.user
+        queryset = FriendshipRequest.objects.filter(receiver=user)
+        return queryset
+    # create와 list를 오버라이드 
+    def list(self,request):
+        queryset = self.get_queryset()
+        serialzier = FriendshipRequestSerializer(queryset,many=True)
+        return Response(serialzier.data,status=status.HTTP_200_OK)
+
     
-    def post(self,request):
-        '''
-            User가 to_user_email에게 FriendshipRequest 요청 
-        '''
-        user = request.user
-        try:
-            to_user_email = request.data.get('to_email')
-            to_user = User.objects.get(email=to_user_email)
-            friendship = FriendshipRequest.objects.create(from_user = user , to_user = to_user)
-            friendship.save()
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_201_CREATED)
-    
-# 친구 요청 승낙 
+# 친구 요청 
 class FriendshipRequestHandleView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 

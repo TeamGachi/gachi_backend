@@ -10,6 +10,7 @@ from .models import Trip
 class TripView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [TripMembersOnly]
+
     def get(self, request):
         ''' 
             자신이 속한 Trip조회
@@ -17,7 +18,7 @@ class TripView(APIView):
         user = request.user
         queryset = Trip.objects.filter(users=user)
         serialzier = TripSerializer(queryset,many=True) 
-        return Response(serialzier.data)
+        return Response(serialzier.data,status=status.HTTP_200_OK)
     
     def post(self, request):
         ''' 
@@ -32,8 +33,18 @@ class TripView(APIView):
         return Response(status=status.HTTP_201_CREATED)
     
     def delete(self,request,pk):
+        '''
+            pk를 가진 여행에서 user삭제 
+        '''
         trip = Trip.objects.get(id=pk)
         trip.users.remove(request.user)
+        # users가 0명이라면 trip 자체도 삭제 
+        if trip.users.count()== 0:
+            # 해당 trip의 모든 사진요소 삭제 
+
+            # 해당 trip 삭제 
+            trip.delete()
+            
         return Response(status=status.HTTP_200_OK)
 
 

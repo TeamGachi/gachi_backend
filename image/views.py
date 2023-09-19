@@ -1,31 +1,29 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from ..trip.permissions import TripMembersOnly
+from trip.permissions import TripMembersOnly
+from rest_framework import generics
 
 # 이미지 업로드 API
-class ImageView(APIView):
+class ImageView(generics.ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [TripMembersOnly]
-    def post(self,request):
-        '''
-            특정 Trip 세션에 이미지 업로드 
-        '''
-        pass
-    def get(self,request):
-        '''
-            특정 Trip 세션의 모든 분류된 이미지 조회 
-        '''
-        pass
+
+    def get_queryset(self):
+        return super().get_queryset()
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+    
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 # 이미지 다운로드 API 
-class ImageDownloadView(APIView):
+class ImageDownloadView(generics.ListAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [TripMembersOnly]
-    def get(self,request):
-        '''
-            특정 Trip 세션의 특정 이미지 다운로드 
-        '''
-    pass
+    
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 

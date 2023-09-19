@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework import status,generics
 from .models import Friend,FriendshipRequest
 from .serializer import FriendSerializer,FriendshipRequestSerializer
-from authentication.models import User
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
 
@@ -36,7 +35,7 @@ class FriendshipRequestView(generics.ListCreateAPIView):
         return Response(serialzier.data,status=status.HTTP_200_OK)
 
     
-# 친구 요청 
+# 친구요청 
 class FriendshipRequestHandleView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 

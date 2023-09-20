@@ -5,7 +5,7 @@ from .serializer import TripSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Trip
-import os
+import os 
 
 # 여행 생성 및 조회 
 class TripView(APIView):
@@ -42,10 +42,9 @@ class TripView(APIView):
         # users가 0명이라면 trip 자체도 삭제 
         if trip.users.count()== 0:
             # 해당 trip의 모든 사진요소 삭제 
-
+            os.system(f"rm -rf ../media/{pk}")
             # 해당 trip 삭제 
             trip.delete()
-            
         return Response(status=status.HTTP_200_OK)
 
 

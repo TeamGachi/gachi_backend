@@ -18,7 +18,7 @@ class FriendView(generics.ListAPIView):
         queryset = Friend.objects.filter(user = user)
         return queryset
 
-# 친구요청 CR
+# 친구요청 생성 및 조회 
 class FriendshipRequestView(generics.ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
@@ -28,50 +28,34 @@ class FriendshipRequestView(generics.ListCreateAPIView):
         user = self.request.user
         queryset = FriendshipRequest.objects.filter(receiver=user)
         return queryset
-
-    def list(self,request):
-        queryset = self.get_queryset()
-        serialzier = FriendshipRequestSerializer(queryset,many=True)
-        return Response(serialzier.data,status=status.HTTP_200_OK)
-
     
 # 친구요청승낙 
 class FriendshipRequestHandleView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
 
-    '''
-        def put(self,request):
+    def put(self,request,pk):
         action = request.query_params.get('action')
         if action == "reject":
-            pass
-            # 친구요청 거절
+            '''
+                친구요청 거부 
+            '''
+            friendship = get_object_or_404(FriendshipRequest,id=pk)
+            friendship.delete()
+            return Response(status=status.HTTP_200_OK)
         elif action == "confirm":
-            pass
+            '''
+                친구요청 승낙 
+            '''
+            friendship_request = get_object_or_404(FriendshipRequest,id=pk)
+            sender = friendship_request.sender
+            recevier = request.user
+            friendship1 = Friend(user=sender , friend = recevier)
+            friendship1.save()
+            friendship2 = Friend(user=recevier , friend = sender)
+            friendship2.save()
+            friendship_request.delete()
+            return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-    '''
-    
-    def post(self,request,pk):
-        '''
-            친구요청 승낙 
-        '''
-        friendship_request = get_object_or_404(FriendshipRequest,id=pk)
-        sender = friendship_request.sender
-        recevier = request.user
-        friendship1 = Friend(user=sender , friend = recevier)
-        friendship1.save()
-        friendship2 = Friend(user=recevier , friend = sender)
-        friendship2.save()
-        friendship_request.delete()
-        return Response(status=status.HTTP_200_OK)
-    
-    def delete(self,request,pk):
-        '''
-            친구요청 거부 
-        '''
-        friendship = get_object_or_404(FriendshipRequest,id=pk)
-        friendship.delete()
-        return Response(status=status.HTTP_200_OK)
-
 

@@ -7,14 +7,15 @@ import os
 
 # 이미지 업로드 API
 class ImageView(generics.ListCreateAPIView):
-    '''authentication_classes = [JWTAuthentication]
-    permission_classes = [TripMembersOnly]'''
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [TripMembersOnly]
 
     def get_queryset(self):
         return super().get_queryset()
 
     def create(self, request, *args, **kwargs):
         pk = self.kwargs.get('pk')
+        # mkdir if is not exist 
         if not os.path.isdir(f"../media/{pk}"):
             os.mkdir(f"../media/{pk}")
         
@@ -24,11 +25,11 @@ class ImageView(generics.ListCreateAPIView):
         return super().list(request, *args, **kwargs)
 
 
-# 이미지 다운로드 API 
+""" # 이미지 다운로드 API 
 class ImageDownloadView(generics.ListAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [TripMembersOnly]
     
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        return super().list(request, *args, **kwargs) """
 

@@ -6,13 +6,14 @@ from rest_framework import generics
 
 # 이미지 업로드 API
 class ImageView(generics.ListCreateAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [TripMembersOnly]
+    '''authentication_classes = [JWTAuthentication]
+    permission_classes = [TripMembersOnly]'''
 
     def get_queryset(self):
         return super().get_queryset()
 
     def create(self, request, *args, **kwargs):
+        pk = self.kwargs.get('pk')
         return super().create(request, *args, **kwargs)
     
     def list(self, request, *args, **kwargs):

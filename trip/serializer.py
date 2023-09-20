@@ -7,13 +7,13 @@ class TripSerializer(ModelSerializer):
         fields = "__all__"
     
     def validate(self, data):
-        pass
+        return data
     
     def create(self,validated_data):
         trip = Trip.objects.create(
             place = validated_data['place'],
-            department = validated_data['department'],
-            arrival = validated_data['arriaval']
+            departing_date = validated_data['departing_date'],
+            arriving_date = validated_data['arriving_date']
         )
         return trip
     

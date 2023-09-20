@@ -25,7 +25,7 @@ class TripView(APIView):
             새로운 Trip 생성 
         '''
         serializer = TripSerializer(data = request.data)
-        if serializer.is_valid(): 
+        if serializer.is_valid(raise_exception=True): 
             trip = serializer.save()
             trip.users.add(request.user)
         else:

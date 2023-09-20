@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from trip.permissions import TripMembersOnly
 from rest_framework import generics
+import os 
 
 # 이미지 업로드 API
 class ImageView(generics.ListCreateAPIView):
@@ -14,6 +15,9 @@ class ImageView(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         pk = self.kwargs.get('pk')
+        if not os.path.isdir(f"../media/{pk}"):
+            os.mkdir(f"../media/{pk}")
+        
         return super().create(request, *args, **kwargs)
     
     def list(self, request, *args, **kwargs):

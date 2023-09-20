@@ -5,6 +5,7 @@ from .serializer import TripSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Trip
+import os
 
 # 여행 생성 및 조회 
 class TripView(APIView):

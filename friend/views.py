@@ -35,11 +35,23 @@ class FriendshipRequestView(generics.ListCreateAPIView):
         return Response(serialzier.data,status=status.HTTP_200_OK)
 
     
-# 친구요청 
+# 친구요청승낙 
 class FriendshipRequestHandleView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
 
+    '''
+        def put(self,request):
+        action = request.query_params.get('action')
+        if action == "reject":
+            pass
+            # 친구요청 거절
+        elif action == "confirm":
+            pass
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+    '''
+    
     def post(self,request,pk):
         '''
             친구요청 승낙 
@@ -60,6 +72,6 @@ class FriendshipRequestHandleView(APIView):
         '''
         friendship = get_object_or_404(FriendshipRequest,id=pk)
         friendship.delete()
-        return Response(status=status.HTTP_20)
+        return Response(status=status.HTTP_200_OK)
 
 

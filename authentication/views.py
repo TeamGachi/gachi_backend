@@ -34,9 +34,9 @@ class LoginView(generics.GenericAPIView):
 class KakaoLoginView(APIView):
     def get(self,request):
         '''
-        카카오 인가코드 요청
+            카카오 인가코드 요청
         '''
-        kakao_login_uri = "https://kauth.kakao.com/oauth/authorize"
+        kakao_login_uri = KAKAO["KAKAO_LOGIN_URI"]
         client_id = KAKAO["REST_API_KEY"]
         redirect_uri = "http://localhost:8000/api/authentication/login/kakao/callback" 
         uri = f"{kakao_login_uri}?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
@@ -47,24 +47,38 @@ class KakaoLoginView(APIView):
 class KakaoLoginCallbackView(APIView):
     def get(self,request):
         '''
-        카카오 인가코드로 access token 요청 
+            카카오 인가코드로 access token 요청 
         '''
-        data = {
+        data = request.query_params.copy()
+        code = data.get('code')
+        if not code:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        request_data = {
             "grant_type" : "authorization_code",
             "cliend_id" : KAKAO["REST_API_KEY"],
             "redirection_uri" : "http://localhost:8000/api/authentication/login/kakao/callback/",
-            "code" : request.GET["code"]
+            'client_secret': KAKAO['KAKAO_CLIENT_SECRET_KEY'],
+            "code" : code
         }
+        token_headers = {
+            'Content-type': 'application/x-www-form-urlencoded;charset=utf-8'
+        }
+     
         kakao_token_api = "https://kauth.kakao.com/oauth/token"
-        access_token = requests.post(kakao_token_api,data=data).json()["access_token"]
-        kakao_inforamtion_api = "https://kapi.kakao.com/v2/user/me"
-        header = {
-            "Authorization" : f"Bearer ${access_token}"
-        }
-        user_information = requests.get(kakao_inforamtion_api,headers=header).json()
-        ## 신규회원이면 회원가입 및 회원이면 로그인 로직 
+        token_res = requests.post(kakao_token_api,data=request_data,headers=token_headers).json()
+        print(token_res)
+
+        '''
+            access_token = requests.post(kakao_token_api,data=data).json()["access_token"]
+            kakao_inforamtion_api = "https://kapi.kakao.com/v2/user/me"
+            header = {
+                "Authorization" : f"Bearer ${access_token}"
+            }
+            user_information = requests.get(kakao_inforamtion_api,headers=header).json()
+        '''
+ 
         
-        ##
         return Response(status=status.HTTP_200_OK)
 
 # 로그아웃      

@@ -4,35 +4,39 @@ from rest_framework import status
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from trip.permissions import TripMembersOnly
 from rest_framework import generics
-from .serializer import ImageCreateSerializer,ImageListSerialzier
+from .serializer import TripImageSerializer
 from .models import TripImage
+from service import ImageClassifier
 
-# 이미지 생성 API view 
+
 class ImageCreateView(generics.CreateAPIView):
+    '''
+        POST
+        TripImage생성 VIEW
+    '''
     authentication_classes = [JWTAuthentication]
     # permission_classes = [TripMembersOnly]
-    serializer_class = ImageCreateSerializer
+    serializer_class = TripImageSerializer
 
-# Trip에 속하는 이미지 조회 View 
 class ImageListView(generics.ListAPIView):
     '''
         GET
-        Trip pk에 속하는 모든 이미지 조회 요청 VIEW 
+        Trip에 속하는 모든 이미지 조회 요청 VIEW 
     '''
     authentication_classes = [JWTAuthentication]
     # permission_classes = [TripMembersOnly]
-    serializer_class = ImageListSerialzier
+    serializer_class = TripImageSerializer
 
     def get_queryset(self):
         queryset = TripImage.objects.filter(person=self.request.user)
         return queryset
     
-# Trip에 속하는 이미지중에서 User가 속하는 image 조회 요청 
 class ImageClassificationView(APIView):
     ''''
         GET 
-        사진에서 User가 속하는 사진만 조회 요청 
+        Trip에서 User가 속하는 사진만 조회 요청 
     '''
-    pass 
+    def get(self,request,pk):
+        image_classifier = ImageClassifier(pk,request.user)
 
 

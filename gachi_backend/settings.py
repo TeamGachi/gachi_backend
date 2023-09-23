@@ -1,5 +1,3 @@
-
-
 from pathlib import Path
 import datetime
 from config import ENV

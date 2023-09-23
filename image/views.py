@@ -6,8 +6,6 @@ from trip.permissions import TripMembersOnly
 from rest_framework import generics
 from .serializer import ImageCreateSerializer,ImageListSerialzier
 from .models import TripImage
-from django.conf import settings
-import os 
 
 # 이미지 생성 API view 
 class ImageCreateView(generics.CreateAPIView):
@@ -17,6 +15,10 @@ class ImageCreateView(generics.CreateAPIView):
 
 # Trip에 속하는 이미지 조회 View 
 class ImageListView(generics.ListAPIView):
+    '''
+        GET
+        Trip pk에 속하는 모든 이미지 조회 요청 VIEW 
+    '''
     authentication_classes = [JWTAuthentication]
     # permission_classes = [TripMembersOnly]
     serializer_class = ImageListSerialzier
@@ -25,12 +27,12 @@ class ImageListView(generics.ListAPIView):
         queryset = TripImage.objects.filter(person=self.request.user)
         return queryset
     
-# Trip에 속하는 이미지 얼굴별 분류 요청 View 
+# Trip에 속하는 이미지중에서 User가 속하는 image 조회 요청 
 class ImageClassificationView(APIView):
-    pass 
-
-# 분류된 폴더에 대한 이름변경 요청 View 
-class ImageClassificationChangeView(APIView):
+    ''''
+        GET 
+        사진에서 User가 속하는 사진만 조회 요청 
+    '''
     pass 
 
 

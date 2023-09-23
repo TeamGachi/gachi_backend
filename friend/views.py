@@ -7,8 +7,11 @@ from .serializer import FriendSerializer,FriendshipRequestSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
 
-# 친구 R
 class FriendView(generics.ListAPIView):
+    '''
+        GET
+        친구 조회 VIEW
+    '''
     authentication_classes = [JWTAuthentication] 
     permission_classes = [IsAuthenticated] 
     serializer_class = FriendSerializer
@@ -18,8 +21,11 @@ class FriendView(generics.ListAPIView):
         queryset = Friend.objects.filter(user = user)
         return queryset
 
-# 친구요청 생성 및 조회 
 class FriendshipRequestView(generics.ListCreateAPIView):
+    '''
+        POST GET 
+        친구요청 생성 및 친구요청 조회 VIEW 
+    '''
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
     serializer_class = FriendshipRequestSerializer
@@ -29,24 +35,25 @@ class FriendshipRequestView(generics.ListCreateAPIView):
         queryset = FriendshipRequest.objects.filter(receiver=user)
         return queryset
     
-# 친구요청승낙 
+
 class FriendshipRequestHandleView(APIView):
+    '''
+        POST DELETE
+        친구요청 거부 및 친구요청 승낙 
+    '''
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
 
-    def put(self,request,pk):
-        action = request.query_params.get('action')
-        if action == "reject":
-            '''
-                친구요청 거부 
-            '''
-            friendship = get_object_or_404(FriendshipRequest,id=pk)
-            friendship.delete()
-            return Response(status=status.HTTP_200_OK)
-        elif action == "confirm":
-            '''
-                친구요청 승낙 
-            '''
+    def delete(self,request,pk):
+        friendship = get_object_or_404(FriendshipRequest,id=pk)
+        friendship.delete()
+        return Response(status=status.HTTP_200_OK)
+
+    def post(self,request,pk):
+        '''
+            친구요청 승낙 
+        '''
+        try:
             friendship_request = get_object_or_404(FriendshipRequest,id=pk)
             sender = friendship_request.sender
             recevier = request.user
@@ -56,6 +63,8 @@ class FriendshipRequestHandleView(APIView):
             friendship2.save()
             friendship_request.delete()
             return Response(status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        
 

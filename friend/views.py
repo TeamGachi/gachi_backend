@@ -6,10 +6,13 @@ from .models import Friend,FriendshipRequest
 from .serializer import FriendSerializer,FriendshipRequestSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
+from django.db import transaction
+
 
 class FriendView(generics.ListAPIView):
     '''
         GET
+        /api/friend/
         친구 조회 VIEW
     '''
     authentication_classes = [JWTAuthentication] 
@@ -24,6 +27,7 @@ class FriendView(generics.ListAPIView):
 class FriendshipRequestView(generics.ListCreateAPIView):
     '''
         POST GET 
+        /api/friend/request/
         친구요청 생성 및 친구요청 조회 VIEW 
     '''
     authentication_classes = [JWTAuthentication]
@@ -45,13 +49,19 @@ class FriendshipRequestHandleView(APIView):
     permission_classes = [IsAuthenticated] 
 
     def delete(self,request,pk):
+        '''
+            친구요청 거절
+            /api/friend/request/<int:pk>
+        '''
         friendship = get_object_or_404(FriendshipRequest,id=pk)
         friendship.delete()
         return Response(status=status.HTTP_200_OK)
 
+    @transaction.atomic
     def post(self,request,pk):
         '''
             친구요청 승낙 
+            /api/friend/request/<int:pk>
         '''
         try:
             friendship_request = get_object_or_404(FriendshipRequest,id=pk)

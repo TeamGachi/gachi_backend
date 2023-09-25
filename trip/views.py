@@ -18,6 +18,7 @@ class TripView(APIView):
 
     def get(self, request):
         ''' 
+            /api/trip/
             자신이 속한 Trip조회
         '''
         user = request.user
@@ -27,6 +28,7 @@ class TripView(APIView):
     
     def post(self, request):
         ''' 
+            /api/trip/<int:pk>
             새로운 Trip 생성 
         '''
         serializer = TripSerializer(data = request.data)
@@ -39,6 +41,7 @@ class TripView(APIView):
     
     def delete(self,request,pk):
         '''
+            /api/trip/<int:pk>
             pk를 가진 여행에서 user삭제 
         '''
         trip = Trip.objects.get(id=pk)

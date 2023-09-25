@@ -12,6 +12,7 @@ from service import ImageClassifier
 class ImageCreateView(generics.CreateAPIView):
     '''
         POST
+        /api/image/
         TripImage생성 VIEW
     '''
     authentication_classes = [JWTAuthentication]
@@ -21,6 +22,7 @@ class ImageCreateView(generics.CreateAPIView):
 class ImageListView(generics.ListAPIView):
     '''
         GET
+        /api/image/<int:pk>
         Trip에 속하는 모든 이미지 조회 요청 VIEW 
     '''
     authentication_classes = [JWTAuthentication]
@@ -33,7 +35,8 @@ class ImageListView(generics.ListAPIView):
     
 class ImageClassificationView(APIView):
     ''''
-        GET 
+        GET
+        /api/image/<int:pk>/<int:email>/ 
         Trip에서 User가 속하는 사진만 조회 요청 
     '''
     def get(self,request,pk):

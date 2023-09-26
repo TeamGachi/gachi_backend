@@ -47,8 +47,8 @@ class ImageClassificationView(generics.ListAPIView):
         user = request.user
         trip = get_object_or_404(Trip,id=pk)
         image_classifier = ImageClassifier(trip,user)
-        query_set = image_classifier.get_user_included_images()
-        serializer = self.get_serializer(query_set,many=True)
+        user_included_query_set = image_classifier.get_user_included_images()
+        serializer = self.get_serializer(user_included_query_set,many=True)
         return Response(data=serializer.data,status=status.HTTP_200_OK)
 
 

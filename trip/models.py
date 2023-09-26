@@ -8,4 +8,5 @@ class Trip(models.Model):
     departing_date = models.DateField(default=localdate)
     arriving_date = models.DateField(default=localdate)
     users = models.ManyToManyField(User,blank=True)
+    
 

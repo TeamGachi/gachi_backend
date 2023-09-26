@@ -14,10 +14,15 @@ class FriendshipRequestSerializer(ModelSerializer):
         model = FriendshipRequest
         fields = "__all__"
 
-    def validate(self, data):
+    def validate(self, data): # 존재하는 유저 및 이미 친구인지 검사 
         if User.objects.get(email=data['sender']) and User.objects.get(email=data['receiver']):
+            friend = get_object_or_404(Friend,user=data['receiver'],friend=data['sender'])
+            if friend is not None:
+                raise serializers.ValidationError(
+                    {"error" : "이미 친구입니다."}
+                )
             return data
-        return serializers.ValidationError(
+        raise serializers.ValidationError(
             {"error":"unalbe to find users"}
         )
 

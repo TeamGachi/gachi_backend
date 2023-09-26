@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 
 
 class UserManager(BaseUserManager):
-    def create_user(self,email,name,gender,birth,password=None):
+    def create_user(self,email,name,gender,birth,password=None,face_image=None):
         if not email:
             raise ValueError("유저 이메일이 존재하지 않습니다.")
         if not name:
@@ -12,7 +12,8 @@ class UserManager(BaseUserManager):
             email = self.normalize_email(email), # 이메일 정규화 
             name = name,
             gender = gender,
-            birth = birth
+            birth = birth,
+            face_image=face_image
         )
         user.set_password(password) # 암호 난독화
         user.save()
@@ -23,7 +24,7 @@ class UserManager(BaseUserManager):
             email = self.normalize_email(email), # 이메일 정규화 
             name = name,
             gender = gender,
-            birth = birth
+            birth = birth,
         )
         user.set_password(password) # 암호 난독화
         user.is_admin = True

@@ -8,7 +8,6 @@ from django.contrib.auth import authenticate
 from config import *
 from django.shortcuts import redirect
 import requests
-# GenericAPI view의 attribute로 시리얼라이저 클래스를 가지고 있고 기본 시리얼라이저로 지정함 
 
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
@@ -42,13 +41,10 @@ class KakaoLoginView(APIView):
         uri = f"{kakao_login_uri}?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
         res = redirect(uri)
         return res
-
+'''
 # Kakao Authentication Redirection View , 인가 token 발급 요청 
 class KakaoLoginCallbackView(APIView):
     def get(self,request):
-        '''
-            카카오 인가코드로 access token 요청 
-        '''
         data = request.query_params.copy()
         code = data.get('code')
         if not code:
@@ -66,21 +62,9 @@ class KakaoLoginCallbackView(APIView):
         }
      
         kakao_token_api = "https://kauth.kakao.com/oauth/token"
-        token_res = requests.post(kakao_token_api,data=request_data,headers=token_headers).json()
-        print(token_res)
-
-        '''
-            access_token = requests.post(kakao_token_api,data=data).json()["access_token"]
-            kakao_inforamtion_api = "https://kapi.kakao.com/v2/user/me"
-            header = {
-                "Authorization" : f"Bearer ${access_token}"
-            }
-            user_information = requests.get(kakao_inforamtion_api,headers=header).json()
-        '''
- 
-        
+        token_res = requests.post(kakao_token_api,data=request_data,headers=token_headers).json()        
         return Response(status=status.HTTP_200_OK)
-
+'''
 # 로그아웃      
 class LogoutView(APIView):
     def get(self,request):
@@ -89,7 +73,6 @@ class LogoutView(APIView):
 # 회원가입 
 class SignUpView(generics.CreateAPIView):
     queryset = User.objects.all()
-    #SignUpView의 시리얼라이저를 지정 
     serializer_class = SignUpSerializer
 
 

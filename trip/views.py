@@ -28,7 +28,7 @@ class TripView(APIView):
     
     def post(self, request):
         ''' 
-            /api/trip/<int:pk>
+            /api/trip/
             새로운 Trip 생성 
         '''
         serializer = TripSerializer(data = request.data)
@@ -37,7 +37,7 @@ class TripView(APIView):
             trip.users.add(request.user)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
     
     def delete(self,request,pk):
         '''
@@ -46,8 +46,10 @@ class TripView(APIView):
         '''
         trip = Trip.objects.get(id=pk)
         trip.users.remove(request.user)
-
-        return Response(status=status.HTTP_200_OK)
+        # 모든 유저가 탈주시 해당 여행도 삭제
+        if trip.users.count()==0:
+            trip.delete()
+        return Response({"log" : "해당 여행을 삭제했습니다."},status=status.HTTP_200_OK)
 
 
 

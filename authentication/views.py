@@ -41,7 +41,7 @@ class KakaoLoginView(APIView):
         uri = f"{kakao_login_uri}?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
         res = redirect(uri)
         return res
-'''
+
 # Kakao Authentication Redirection View , 인가 token 발급 요청 
 class KakaoLoginCallbackView(APIView):
     def get(self,request):
@@ -64,7 +64,7 @@ class KakaoLoginCallbackView(APIView):
         kakao_token_api = "https://kauth.kakao.com/oauth/token"
         token_res = requests.post(kakao_token_api,data=request_data,headers=token_headers).json()        
         return Response(status=status.HTTP_200_OK)
-'''
+
 # 로그아웃      
 class LogoutView(APIView):
     def get(self,request):

@@ -4,7 +4,6 @@ from authentication.models import User
 import datetime
 
 def image_upload_path(instance, filename):
-    # Construct the upload path based on the user's email
     return f'images/{instance.trip.id}/{filename}'
 
 class TripImage(models.Model):

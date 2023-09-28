@@ -9,4 +9,8 @@ class Trip(models.Model):
     arriving_date = models.DateField(default=localdate)
     users = models.ManyToManyField(User,blank=True)
     
-
+# TripInvite 
+class TripInvite(models.Model):
+    trip = models.ForeignKey(Trip,on_delete=models.CASCADE)
+    sender = models.ForeignKey(User,on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User,on_delete=models.CASCADE)

@@ -12,11 +12,11 @@ class ImageClassifier:
         self.trip = trip
         self.user_face = face_recognition.load_image_file(self.user.face_image)
 
-    def is_user_included(self,query):
+    def is_user_included(self,trip_image):
         '''
             해당 image model에 user가 포함되어있는지 반환 
         '''
-        target_image = face_recognition.load_image_file(query.image)
+        target_image = face_recognition.load_image_file(trip_image.image)
         # 리사이징 
         small_frame = cv2.resize(target_image, (0, 0), fx=0.25, fy=0.25)
         # BGR to RGB 로 포매팅 변경 
@@ -35,12 +35,12 @@ class ImageClassifier:
         '''
             Trip에서 User 얼굴이 들어있는 Image model만 반환 
         '''
-        user_included_querys = []
-        query_set = self.trip.objects.images.all()
-        for query in query_set:
-            if self.is_user_included(query):
-                user_included_querys.append(query)
-        return user_included_querys
+        user_included_images = []
+        trip_images = self.trip.objects.images.all()
+        for trip_image in trip_images:
+            if self.is_user_included(trip_image):
+                user_included_images.append(trip_image)
+        return user_included_images
 
     
         

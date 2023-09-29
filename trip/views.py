@@ -9,7 +9,6 @@ from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from .models import Trip,TripInvite
 
-# 여행 생성 및 조회 
 class TripView(APIView):
     '''
         GET POST DELETE
@@ -21,7 +20,7 @@ class TripView(APIView):
     def get(self, request):
         ''' 
             /api/trip/
-            자신이 속한 Trip조회
+            user가 속한 Trip조회
         '''
         user = request.user
         queryset = Trip.objects.filter(users=user)
@@ -56,38 +55,24 @@ class TripView(APIView):
 
 class TripInviteView(generics.CreateAPIView):
     '''
-        GET POST 
-        TripInvite 생성 및 조회 
+        POST 
+        TripInvite 생성 및 자신에게 온 TripInvite 모두 조회 
         /api/trip/invite/
     '''
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    
 
-class TrpInviteDeleteView(generics.DestroyAPIView):
+class TrpInviteHandleView(generics.RetrieveUpdateDestroyAPIView):
     '''
-        DELETE
-        TripInvite 삭제
+        GET PATCH DELETE
+        특정 TripInvite 조회 수정 삭제 
+        /api/trip/invite/<int:pk>/
     '''
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
     def get_queryset(self):
         query = TripInvite.objects.get(id=self.kwargs['pk'])
         return query
 
-class TripInviteAcceptView(generics.UpdateAPIView):
-    '''
-        PATCH 
-        TripInvite 삭제 후 Trip의 User 필드에 user 추가  
-    '''
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    serializer_class = TripInviteSerializer
-
-    def update(self, request, *args, **kwargs):
-        trip_invite = get_object_or_404(trip_invite,id=kwargs['pk'])
-        trip = trip_invite.trip
-        trip_invite.delete()
-        trip.users.add(request.user)
-        return Response(status=status.HTTP_200_OK)

@@ -12,5 +12,5 @@ class Trip(models.Model):
 # TripInvite 
 class TripInvite(models.Model):
     trip = models.ForeignKey(Trip,on_delete=models.CASCADE)
-    sender = models.ForeignKey(User,on_delete=models.CASCADE)
-    receiver = models.ForeignKey(User,on_delete=models.CASCADE)
+    sender = models.ForeignKey(User,on_delete=models.CASCADE,related_name='sent_trip_invites')
+    receiver = models.ForeignKey(User,on_delete=models.CASCADE,related_name='received_trip_invites')

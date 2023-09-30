@@ -2,16 +2,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from trip.permissions import TripMembersOnly
 from rest_framework import generics
 from .serializer import TripImageSerializer
 from .models import TripImage
 from service import ImageClassifier
 from django.shortcuts import get_object_or_404
 from service import *
-
-
-
 
 class ImageCreateView(generics.CreateAPIView):
     '''

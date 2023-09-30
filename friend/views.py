@@ -40,31 +40,23 @@ class FriendshipRequestView(generics.ListCreateAPIView):
         return queryset
     
 
-class FriendshipRequestHandleView(APIView):
+class FriendshipRequestHandleView(generics.UpdateAPIView):
     '''
-        POST DELETE
+        PATCH
         친구요청 거부 및 친구요청 승낙 
     '''
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
 
-    def delete(self,request,pk):
-        '''
-            친구요청 거절
-            /api/friend/request/<int:pk>
-        '''
-        friendship = get_object_or_404(FriendshipRequest,id=pk)
-        friendship.delete()
-        return Response(status=status.HTTP_200_OK)
-
     @transaction.atomic
-    def post(self,request,pk):
+    def update(self, request, *args, **kwargs):
         '''
-            친구요청 승낙 
-            /api/friend/request/<int:pk>
+            친구요청 승낙 및 거절
         '''
-        try:
-            friendship_request = get_object_or_404(FriendshipRequest,id=pk)
+        action = request.data['action']
+        data = {"message":""}
+        if action == "accept":
+            friendship_request = get_object_or_404(FriendshipRequest,id=kwargs['pk'])
             sender = friendship_request.sender
             recevier = request.user
             friendship1 = Friend(user=sender , friend = recevier)
@@ -72,9 +64,13 @@ class FriendshipRequestHandleView(APIView):
             friendship2 = Friend(user=recevier , friend = sender)
             friendship2.save()
             friendship_request.delete()
-            return Response(status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            data["message"] = "친구요청을 수락하였습니다."
+        elif action == "reject":
+            friendship = get_object_or_404(FriendshipRequest,id=kwargs['pk'])
+            friendship.delete()
+            data["message"] = "친구요청을 거절하였습니다."
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(data=data,status=status.HTTP_200_OK)
 
-        
 

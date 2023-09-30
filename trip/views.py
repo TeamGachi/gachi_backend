@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import IsAuthenticated
-from .permissions import TripMembersOnly
+from permissions import TripMembersOnly
 from .serializer import TripSerializer
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,44 +10,37 @@ from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from .models import Trip,TripInvite
 
-class TripView(APIView):
+class TripView(generics.ListCreateAPIView):
     '''
-        GET POST DELETE
-        여행 조회 , 여행 생성 , 여행 삭제 
+        GET POST 
+        /api/trip/
+        여행 조회 , 여행 생성 
     '''
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    permission_classes = [TripMembersOnly]
+    serializer_class = TripSerializer
 
-    def get(self, request):
-        ''' 
-            /api/trip/
-            user가 속한 Trip조회
-        '''
-        user = request.user
+    def get_queryset(self):
+        user = self.request.user
         queryset = Trip.objects.filter(users=user)
-        serialzier = TripSerializer(queryset,many=True) 
-        return Response(serialzier.data,status=status.HTTP_200_OK)
+        return queryset
     
-    def post(self, request):
-        ''' 
-            /api/trip/
-            새로운 Trip 생성 
-        '''
-        serializer = TripSerializer(data = request.data)
-        if serializer.is_valid(raise_exception=True): 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
             trip = serializer.save()
             trip.users.add(request.user)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_201_CREATED)
     
-    def patch(self,request,pk):
-        '''
-            /api/trip/<int:pk>/
-            pk를 가진 여행에서 user삭제 
-        '''
-        print(request.data)
+
+class TripHandleView(generics.UpdateAPIView):
+    '''
+        /api/trip/<int:pk>/
+        pk를 가진 여행에서 user삭제 
+    '''
+    def update(self, request, *args, **kwargs):
         action = request.data['action']
         if action == "remove":
             trip = Trip.objects.get(id=pk)
@@ -60,7 +53,8 @@ class TripView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class TripInviteView(generics.CreateListAPIView):
+
+class TripInviteView(generics.ListCreateAPIView):
     '''
         GET POST 
         TripInvite 생성 및 자신에게 온 TripInvite 모두 조회 
@@ -70,8 +64,6 @@ class TripInviteView(generics.CreateListAPIView):
     permission_classes = [IsAuthenticated]
 
     
-
-
 class TrpInviteHandleView(APIView):
     '''
         PATCH 

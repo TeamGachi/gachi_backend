@@ -29,19 +29,12 @@ class FriendshipRequestSerializer(ModelSerializer):
     def create(self, validated_data):
         sender = self.context['request'].user
         receiver = User.objects.get(email=validated_data['receiver'])
-
-        # 이미 친구 관계일 경우 exception 
-        if Friend.objects.filter(user = sender,friend=receiver).exists():
-            raise serializers.ValidationError({'name': '이미 친구관계입니다.'})
-        # at least one object satisfying query exists
-        else:
-            # no object satisfying query exists
-            friendship = FriendshipRequest.objects.create(
-                sender = sender,
-                receiver = receiver
-            )
-            friendship.save() 
-            return friendship
+        friendship = FriendshipRequest.objects.create(
+            sender = sender,
+            receiver = receiver
+        )
+        friendship.save() 
+        return friendship
 
     
     

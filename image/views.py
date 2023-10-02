@@ -23,7 +23,7 @@ class ImageListView(generics.ListAPIView):
     '''
         GET
         /api/image/<int:pk>
-        Trip에 속하는 모든 이미지 조회 요청 VIEW 
+        Trip에 속하는 이미지 조회 요청 VIEW 
     '''
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
@@ -32,24 +32,18 @@ class ImageListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = TripImage.objects.filter(trip=self.kwargs['pk'])
         return queryset
+    
+    def list(self, request, *args, **kwargs):
+        user = self.request.GET['user']
+        if user is None: # PK에 속하는 모든 여행 이미지 리턴 
+            queryset = self.get_queryset()
+            serializer = self.get_serializer(queryset,many=True)
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+        else: # user가 포함된 이미지 리턴 
+            trip = get_object_or_404(Trip,id=kwargs['pk'])
+            image_classifier = ImageClassifier(trip=trip,user=user)
+            user_included_queryset = image_classifier.get_user_included_images() # trip 의 이미지에서 user가 포함된 이미지 queryset만 반환 
+            serializer = self.get_serializer(user_included_queryset,many=True)
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
 
     
-class ImageClassificationView(generics.ListAPIView):
-    ''''
-        GET
-        /api/image/mine/<int:pk>/
-        Trip pk에서 User가 속하는 사진만 조회 요청 
-    '''
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated] 
-    serializer_class = TripImageSerializer
-
-    def get(self,request,pk):
-        user = request.user
-        trip = get_object_or_404(Trip,id=pk)
-        image_classifier = ImageClassifier(trip,user)
-        user_included_trip_images = image_classifier.get_user_included_images()
-        serializer = self.get_serializer(user_included_trip_images,many=True)
-        return Response(data=serializer.data,status=status.HTTP_200_OK)
-
-

@@ -4,7 +4,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 ENV = {
-    "SECRETKEY" : os.getenv("SECRETKEY")
+    "SECRETKEY" : os.getenv("SECRETKEY"),
+    "BROKER_RUL" : os.getenv("BROKER_RUL"),
+    "CELERY_RESULT_BACKEND" : os.getenv("CELERY_RESULT_BACKEND")
 }
 
 KAKAO = {

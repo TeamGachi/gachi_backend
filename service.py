@@ -3,6 +3,10 @@ from trip.models import Trip
 from authentication.models import User
 from django.conf import settings
 import cv2
+from celery import Celery
+from config import ENV
+
+app = Celery('tasks', broker=ENV["BROKER_RUL"], backend=ENV["CELERY_RESULT_BACKEND"])
 
 class ImageClassifier:
     '''
@@ -12,6 +16,7 @@ class ImageClassifier:
         self.user = user
         self.trip = trip
 
+    @app.task
     def is_user_included(self,trip_image):
         '''
             해당 image model에 user가 포함되어있는지 반환 

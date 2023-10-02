@@ -1,4 +1,3 @@
-from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status,generics
@@ -28,7 +27,7 @@ class FriendshipRequestView(generics.ListCreateAPIView):
     '''
         POST GET 
         /api/friend/request/
-        친구요청 생성 및 친구요청 조회 VIEW 
+        친구요청 생성 및 친구요청 조회 
     '''
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 

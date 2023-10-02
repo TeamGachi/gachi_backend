@@ -3,7 +3,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import IsAuthenticated
 from permissions import TripMembersOnly
-from .serializer import TripSerializer
+from .serializer import TripSerializer,TripInviteSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
@@ -62,6 +62,12 @@ class TripInviteView(generics.ListCreateAPIView):
     '''
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = TripInviteSerializer
+
+    def get_queryset(self):
+        queryset = TripInvite.objects.filter(receiver=self.request.user)
+        return queryset
+    
 
     
 class TrpInviteHandleView(APIView):
@@ -73,11 +79,11 @@ class TrpInviteHandleView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def path(self,request,*args,**kwargs):
+    def patch(self,request,*args,**kwargs):
         trip_invite = get_object_or_404(TripInvite,id=kwargs['pk'])
         action = request.data['action']
         data = {"message": "" }
-        if action == "accpet":
+        if action == "accept":
             trip = trip_invite.trip
             trip.users.add(request.user)
             trip_invite.delete()
@@ -87,6 +93,6 @@ class TrpInviteHandleView(APIView):
             data["message"] = "초대를 거절하였습니다."
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_200_OK)
+        return Response(data=data,status=status.HTTP_200_OK)
 
  

@@ -5,8 +5,9 @@ from django.conf import settings
 import cv2
 from celery import Celery
 from config import ENV
+from image.models import TripImage
 
-app = Celery('tasks', broker=ENV["BROKER_RUL"], backend=ENV["CELERY_RESULT_BACKEND"])
+# app = Celery('tasks', broker=ENV["BROKER_RUL"], backend=ENV["CELERY_RESULT_BACKEND"])
 
 class ImageClassifier:
     '''
@@ -16,8 +17,8 @@ class ImageClassifier:
         self.user = user
         self.trip = trip
 
-    @app.task
-    def is_user_included(self,trip_image):
+    # @app.task
+    def is_user_included(self,trip_image : TripImage):
         '''
             해당 image model에 user가 포함되어있는지 반환 
         '''
@@ -44,10 +45,11 @@ class ImageClassifier:
         '''
         user_included_images = []
         trip_images = self.trip.images.all() # Trip을 참조하고 있는 image 모델 인스턴스 queryset 
-
         for trip_image in trip_images:
             if self.is_user_included(trip_image):
                 user_included_images.append(trip_image)
+        
+        
 
         return user_included_images
 

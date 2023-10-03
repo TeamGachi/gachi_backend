@@ -34,13 +34,14 @@ class ImageListView(generics.ListAPIView):
         return queryset
     
     def list(self, request, *args, **kwargs):
-        user = self.request.GET['user']
-        if user is None: # PK에 속하는 모든 여행 이미지 리턴 
+        email = self.request.GET.get("email",None)
+        if email is None: # PK에 속하는 모든 여행 이미지 리턴 
             queryset = self.get_queryset()
             serializer = self.get_serializer(queryset,many=True)
             return Response(data=serializer.data,status=status.HTTP_200_OK)
         else: # user가 포함된 이미지 리턴 
             trip = get_object_or_404(Trip,id=kwargs['pk'])
+            user = get_object_or_404(User,email=email)
             image_classifier = ImageClassifier(trip=trip,user=user)
             user_included_queryset = image_classifier.get_user_included_images() # trip 의 이미지에서 user가 포함된 이미지 queryset만 반환 
             serializer = self.get_serializer(user_included_queryset,many=True)

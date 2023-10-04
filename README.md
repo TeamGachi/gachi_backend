@@ -14,5 +14,6 @@ Trip together , Share images easily !
 
 # Architecture
 ![image](https://github.com/TeamGachi/gachi_backend/assets/81519350/a6d17bca-2f75-4229-ad55-cc2b7556aa9a)
+![image](https://github.com/TeamGachi/gachi_backend/assets/81519350/445ed7d8-8165-4b56-a149-5619a76b7f77)
 
 

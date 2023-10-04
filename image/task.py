@@ -1,19 +1,16 @@
+
+from celery import shared_task
 import face_recognition
 from trip.models import Trip
 from authentication.models import User
 from django.conf import settings
 import cv2
-from celery import Celery
 from config import ENV
 from image.models import TripImage
-import time
 
-app = Celery('service', broker=ENV["BROKER_RUL"], backend=ENV["CELERY_RESULT_BACKEND"])
-
-@app.task
-def compute(): # some async 
-    time.sleep(5)
-    return "done"
+@shared_task
+def get_images():
+    pass
 
 class ImageClassifier:
     '''
@@ -23,7 +20,7 @@ class ImageClassifier:
         self.user = user
         self.trip = trip
 
-    # @app.task
+
     def is_user_included(self,trip_image : TripImage):
         '''
             해당 image model에 user가 포함되어있는지 반환 
@@ -44,7 +41,7 @@ class ImageClassifier:
                 return True
         return False
 
-
+    @shared_task
     def get_user_included_images(self):
         '''
             Trip에서 User 얼굴이 들어있는 Image model만 반환 
@@ -54,11 +51,4 @@ class ImageClassifier:
         for trip_image in trip_images:
             if self.is_user_included(trip_image):
                 user_included_images.append(trip_image)
-        
-        
-
         return user_included_images
-
-    
-        
-

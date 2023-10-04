@@ -4,10 +4,10 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import generics
 from .serializer import TripImageSerializer
 from .models import TripImage
-from service import ImageClassifier
 from django.shortcuts import get_object_or_404
-from service import *
 from permissions import TripMembersOnly
+from .task import * 
+from celery.result import AsyncResult
 
 class ImageCreateView(generics.CreateAPIView):
     '''
@@ -39,12 +39,35 @@ class ImageListView(generics.ListAPIView):
             queryset = self.get_queryset()
             serializer = self.get_serializer(queryset,many=True)
             return Response(data=serializer.data,status=status.HTTP_200_OK)
-        else: # user가 포함된 이미지 리턴 
+        else: # Return Task ID 
             trip = get_object_or_404(Trip,id=kwargs['pk'])
             user = get_object_or_404(User,email=email)
             image_classifier = ImageClassifier(trip=trip,user=user)
-            user_included_queryset = image_classifier.get_user_included_images() # trip 의 이미지에서 user가 포함된 이미지 queryset만 반환 
-            serializer = self.get_serializer(user_included_queryset,many=True)
-            return Response(data=serializer.data,status=status.HTTP_200_OK)
+            task = image_classifier.get_user_included_images.delay() 
+            return Response(data={"task":str(task)},status=status.HTTP_200_OK)
+        
+class ClassfiedImageListView(generics.ListAPIView):
+    '''
+        GET
+        /api/image/classified/<str:task>/
+        Trip에 속하는 분류된 이미지 요청 View 
+    '''
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [TripMembersOnly] 
+    serializer_class = TripImageSerializer
+
+    def list(self, request, *args, **kwargs):
+        task_id = self.request.GET.get("task",None)
+        if task_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        task_result = AsyncResult(task_id)
+        result = {
+            "task_id": task_id,
+            "task_status": task_result.status,
+            "task_result": task_result.result
+        }
+        return Response(data=result,status=status.HTTP_200_OK)
+
+
 
     

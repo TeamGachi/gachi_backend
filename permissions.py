@@ -1,11 +1,7 @@
 from rest_framework.permissions import BasePermission
 from rest_framework.exceptions import PermissionDenied, NotAuthenticated
-from django.shortcuts import get_object_or_404
-from authentication.models import User
 from trip.models import Trip
 
-
-# Custom Trip Permission Class 
 class TripMembersOnly(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated

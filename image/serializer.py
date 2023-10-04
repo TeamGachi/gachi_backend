@@ -7,4 +7,5 @@ class TripImageSerializer(serializers.ModelSerializer):
         model = TripImage
         fields = "__all__"
 
+
     

@@ -80,7 +80,10 @@ class TrpInviteHandleView(APIView):
 
     def patch(self,request,*args,**kwargs):
         trip_invite = get_object_or_404(TripInvite,id=kwargs['pk'])
-        action = request.data['action']
+        try:
+            action = request.data['action']
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         data = {"message": "" }
         if action == "accept":
             trip = trip_invite.trip

@@ -6,8 +6,14 @@ import cv2
 from celery import Celery
 from config import ENV
 from image.models import TripImage
+import time
 
-# app = Celery('tasks', broker=ENV["BROKER_RUL"], backend=ENV["CELERY_RESULT_BACKEND"])
+app = Celery('service', broker=ENV["BROKER_RUL"], backend=ENV["CELERY_RESULT_BACKEND"])
+
+@app.task
+def compute(): # some async 
+    time.sleep(5)
+    return "done"
 
 class ImageClassifier:
     '''

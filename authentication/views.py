@@ -14,7 +14,6 @@ class LoginView(generics.GenericAPIView):
     def post(self,request):
         serializer = self.get_serializer(data=request.data) # genericAPIview의 get_serializer를 통해 시리얼라이저 지정
         if serializer.is_valid(raise_exception=True): # login 데이터가 유효한지 검사하기 위해 validate메소드 실행
-            # validated data는 is_valid를 통해 validate를 진행한 딕셔너리 
             user = authenticate( # basic authentication model을 활용하여 인증 
                 request,
                 email = serializer.validated_data['email'],

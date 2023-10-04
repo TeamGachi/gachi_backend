@@ -1,13 +1,13 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 from .serializer import TripImageSerializer
 from .models import TripImage
 from service import ImageClassifier
 from django.shortcuts import get_object_or_404
 from service import *
+from permissions import TripMembersOnly
 
 class ImageCreateView(generics.CreateAPIView):
     '''
@@ -16,7 +16,7 @@ class ImageCreateView(generics.CreateAPIView):
         TripImage생성 VIEW
     '''
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated] 
+    permission_classes = [TripMembersOnly] 
     serializer_class = TripImageSerializer
 
 class ImageListView(generics.ListAPIView):
@@ -26,7 +26,7 @@ class ImageListView(generics.ListAPIView):
         Trip에 속하는 이미지 조회 요청 VIEW 
     '''
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated] 
+    permission_classes = [TripMembersOnly] 
     serializer_class = TripImageSerializer
 
     def get_queryset(self):

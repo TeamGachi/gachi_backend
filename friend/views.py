@@ -6,7 +6,7 @@ from .serializer import FriendSerializer,FriendshipRequestSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
 from django.db import transaction
-from service import compute
+
 
 
 class FriendView(generics.ListAPIView):
@@ -24,11 +24,7 @@ class FriendView(generics.ListAPIView):
         queryset = Friend.objects.filter(user = user)
         return queryset
     
-    def list(self, request, *args, **kwargs):
-        message = compute.delay() # some asyncrous task 
-        print("immediate computation")
-        print(message)
-        return super().list(request, *args, **kwargs)
+
 
 class FriendshipRequestView(generics.ListCreateAPIView):
     '''

@@ -35,38 +35,17 @@ class ImageListView(generics.ListAPIView):
     
     def list(self, request, *args, **kwargs):
         email = self.request.GET.get("email",None)
-        if email is None: # PK에 속하는 모든 여행 이미지 리턴 
+        if email is None:
             queryset = self.get_queryset()
             serializer = self.get_serializer(queryset,many=True)
             return Response(data=serializer.data,status=status.HTTP_200_OK)
-        else: # Return Task ID 
-            trip = get_object_or_404(Trip,id=kwargs['pk'])
+        else: 
+            queryset = self.get_queryset()
             user = get_object_or_404(User,email=email)
-            image_classifier = ImageClassifier(trip=trip,user=user)
-            task = image_classifier.get_user_included_images.delay() 
-            return Response(data={"task":str(task)},status=status.HTTP_200_OK)
-        
-class ClassfiedImageListView(generics.ListAPIView):
-    '''
-        GET
-        /api/image/classified/<str:task>/
-        Trip에 속하는 분류된 이미지 요청 View 
-    '''
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [TripMembersOnly] 
-    serializer_class = TripImageSerializer
+            result = get_user_included_images(user,queryset)
+            serializer = self.get_serializer(result,many=True)
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
 
-    def list(self, request, *args, **kwargs):
-        task_id = self.request.GET.get("task",None)
-        if task_id is None:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        task_result = AsyncResult(task_id)
-        result = {
-            "task_id": task_id,
-            "task_status": task_result.status,
-            "task_result": task_result.result
-        }
-        return Response(data=result,status=status.HTTP_200_OK)
 
 
 

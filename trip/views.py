@@ -1,71 +1,100 @@
-
-from rest_framework import generics,status
-from rest_framework.response import Response
-from serializer import TripSerializer
-from models import Trip
 from rest_framework.views import APIView
-from permissions import GroupMembersOnly
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
+from .serializer import TripSerializer,TripInviteSerializer
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import generics
 from django.shortcuts import get_object_or_404
+from .models import Trip,TripInvite
 
-# 여행 스케줄 CRUD
+class TripView(generics.ListCreateAPIView):
+    '''
+        GET POST 
+        /api/trip/
+        여행 조회 , 여행 생성 
+    '''
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = TripSerializer
 
-# 여행 생성 API
-class TripView(APIView):
-    permission_classes = [GroupMembersOnly]
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Trip.objects.filter(users=user)
+        return queryset
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            trip = serializer.save()
+            trip.users.add(request.user)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_201_CREATED)
+    
 
-    def get(self, request, group):
-        trip_list = Trip.objects.filter(group=group)
-        serializer = TripSerializer(trip_list, many=True)
-        group = get_object_or_404(Group, id=group)
-        user_name_list = User.objects.filter(usergroup__group=group.id, usergroup__is_confirmed=True).values_list(
-            'name', flat=True)
-        response = {
-            "status": status.HTTP_200_OK,
-            "data": {
-                "group_name": group.name,
-                "group_members": user_name_list,
-                "trip_list": serializer.data
-            }
-        }
-        return Response(response)
+class TripHandleView(generics.UpdateAPIView):
+    '''
+        /api/trip/<int:pk>/
+        pk를 가진 여행에서 user삭제 
+    '''
+    def update(self, request, *args, **kwargs):
+        action = request.data['action']
+        if action == "remove":
+            trip = Trip.objects.get(id=pk)
+            trip.users.remove(request.user)
+            # 모든 유저가 여행을 떠날시 해당 여행도 삭제 
+            if trip.users.count()==0:
+                trip.delete()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request, group):
-        s3_client = MyS3Client(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME)
+
+
+class TripInviteView(generics.ListCreateAPIView):
+    '''
+        GET POST 
+        TripInvite 생성 및 자신에게 온 TripInvite 모두 조회 
+        /api/trip/invite/
+    '''
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = TripInviteSerializer
+
+    def get_queryset(self):
+        queryset = TripInvite.objects.filter(receiver=self.request.user)
+        return queryset
+    
+
+    
+class TrpInviteHandleView(APIView):
+    '''
+        PATCH 
+        TripInvite 거절 및 수락 
+        /api/trip/invite/<int:pk>/
+    '''
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def patch(self,request,*args,**kwargs):
+        trip_invite = get_object_or_404(TripInvite,id=kwargs['pk'])
         try:
-            thumbnail = s3_client.upload(request.FILES['thumbnail'])[1]
-        except Exception as e:
-            print(e)
-            thumbnail = None
-        data = {
-            "group": group,
-            "place": json.loads(request.data.get("place")),
-            "departing_date": json.loads(request.data.get("departing_date")),
-            "arriving_date": json.loads(request.data.get("arriving_date")),
-            "thumbnail": thumbnail
-        }
-        serializer = TripSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            action = request.data['action']
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        data = {"message": "" }
+        if action == "accept":
+            trip = trip_invite.trip
+            trip.users.add(request.user)
+            trip_invite.delete()
+            data["message"] = "초대를 수락하였습니다."
+        elif action == "reject":
+            trip_invite.delete()
+            data["message"] = "초대를 거절하였습니다."
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(data=data,status=status.HTTP_200_OK)
 
-# 자신이 속한 여행 조회 API
-class TripDetailView(APIView):
-    permission_classes = [GroupMembersOnly]
-
-    def get(self, request, trip):
-        trip = get_object_or_404(Trip, id=trip)
-        self.check_object_permissions(self.request, obj=trip)
-        serializer = TripSerializer(trip)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def patch(self, request, trip):
-        trip_instance = get_object_or_404(Trip, id=trip)
-        self.check_object_permissions(self.request, obj=trip_instance)
-        serializer = TripSerializer(instance=trip_instance, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+ 

@@ -1,9 +1,10 @@
 from django.urls import path
-from .views import FreindRequestView,AcceptRequestView
+from .views import FriendView,FriendshipRequestView,FriendshipRequestHandleView
 
-app_name = 'authentication'
+app_name = 'friend'
 
 urlpatterns = [
-    path('request/', FreindRequestView.as_view(), name='request'),
-    path('accept/',AcceptRequestView.as_view(),name='accept')
+    path('', FriendView.as_view(), name='friend'),
+    path('request/',FriendshipRequestView.as_view(),name='friendship_request'),
+    path('request/<int:pk>/',FriendshipRequestHandleView.as_view(),name='friendship_handle'),
 ]

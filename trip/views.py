@@ -1,4 +1,3 @@
-from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import IsAuthenticated
@@ -13,7 +12,7 @@ class TripView(generics.ListCreateAPIView):
     '''
         GET POST 
         /api/trip/
-        여행 조회 , 여행 생성 
+        User가 속한 여행 조회 , User가 여행 생성 
     '''
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -26,23 +25,26 @@ class TripView(generics.ListCreateAPIView):
     
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid(raise_exception=False):
             trip = serializer.save()
             trip.users.add(request.user)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_201_CREATED)
+            return Response(data={"message" : "유효하지 않은 정보입니다."},status=status.HTTP_400_BAD_REQUEST)
+        return Response(data=serializer.data,status=status.HTTP_201_CREATED)
     
 
-class TripHandleView(generics.UpdateAPIView):
+class TripUpdateView(generics.UpdateAPIView):
     '''
         /api/trip/<int:pk>/
-        pk를 가진 여행에서 user삭제 
+        PK 여행 레코드에서 User를 제외 
     '''
     def update(self, request, *args, **kwargs):
-        action = request.data['action']
-        if action == "remove":
-            trip = Trip.objects.get(id=pk)
+        try:
+            action = request.data['action']
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if action == "withdraw":
+            trip = get_object_or_404(Trip,id=kwargs['pk'])
             trip.users.remove(request.user)
             # 모든 유저가 여행을 떠날시 해당 여행도 삭제 
             if trip.users.count()==0:
@@ -69,7 +71,7 @@ class TripInviteView(generics.ListCreateAPIView):
     
 
     
-class TrpInviteHandleView(APIView):
+class TrpInviteUpdateView(generics.UpdateAPIView):
     '''
         PATCH 
         TripInvite 거절 및 수락 
@@ -78,7 +80,7 @@ class TrpInviteHandleView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def patch(self,request,*args,**kwargs):
+    def update(self,request,*args,**kwargs):
         trip_invite = get_object_or_404(TripInvite,id=kwargs['pk'])
         try:
             action = request.data['action']

@@ -8,6 +8,8 @@ from django.shortcuts import get_object_or_404
 from permissions import TripMembersOnly
 from .task import * 
 from celery.result import AsyncResult
+from authentication.models import User
+import time
 
 class ImageCreateView(generics.CreateAPIView):
     '''
@@ -22,7 +24,7 @@ class ImageCreateView(generics.CreateAPIView):
 class ImageListView(generics.ListAPIView):
     '''
         GET
-        /api/image/<int:pk>
+        /api/image/<int:pk>/
         Trip에 속하는 이미지 조회 요청 VIEW 
     '''
     authentication_classes = [JWTAuthentication]
@@ -35,6 +37,9 @@ class ImageListView(generics.ListAPIView):
     
     def list(self, request, *args, **kwargs):
         email = self.request.GET.get("email",None)
+        time.sleep(10)
+        return Response(status=status.HTTP_200_OK)
+        '''
         if email is None:
             queryset = self.get_queryset()
             serializer = self.get_serializer(queryset,many=True)
@@ -45,6 +50,7 @@ class ImageListView(generics.ListAPIView):
             result = get_user_included_images(user,queryset)
             serializer = self.get_serializer(result,many=True)
             return Response(data=serializer.data,status=status.HTTP_200_OK)
+        '''
 
 
 

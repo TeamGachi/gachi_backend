@@ -19,11 +19,11 @@ class FriendshipRequestSerializer(ModelSerializer):
             query = Friend.objects.filter(user=data['sender'],friend=data['receiver'])
             if query.exists():
                 raise serializers.ValidationError(
-                    {"error" : "이미 친구입니다."}
+                    {"message" : "이미 친구입니다."}
                 )
             return data
         raise serializers.ValidationError(
-            {"error":"해당하는 sender나 receiver가 존재하지 않습니다."}
+            {"message":"해당하는 sender나 receiver가 존재하지 않습니다."}
         )
 
     def create(self, validated_data):

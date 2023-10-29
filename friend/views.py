@@ -7,8 +7,6 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 
-
-
 class FriendView(generics.ListAPIView):
     '''
         GET
@@ -23,8 +21,6 @@ class FriendView(generics.ListAPIView):
         user = self.request.user
         queryset = Friend.objects.filter(user = user)
         return queryset
-    
-
 
 class FriendshipRequestView(generics.ListCreateAPIView):
     '''
@@ -40,11 +36,11 @@ class FriendshipRequestView(generics.ListCreateAPIView):
         user = self.request.user
         queryset = FriendshipRequest.objects.filter(receiver=user)
         return queryset
-    
 
 class FriendshipRequestHandleView(generics.UpdateAPIView):
     '''
         PATCH
+        /api/friend/request/<int:pk>/
         친구요청 거부 및 친구요청 승낙 
     '''
     authentication_classes = [JWTAuthentication]
@@ -64,9 +60,9 @@ class FriendshipRequestHandleView(generics.UpdateAPIView):
             friendship_request = get_object_or_404(FriendshipRequest,id=kwargs['pk'])
             sender = friendship_request.sender
             recevier = request.user
-            friendship1 = Friend(user=sender , friend = recevier)
+            friendship1 = Friend(user=sender,friend=recevier)
             friendship1.save()
-            friendship2 = Friend(user=recevier , friend = sender)
+            friendship2 = Friend(user=recevier,friend=sender)
             friendship2.save()
             friendship_request.delete()
             data["message"] = "친구요청을 수락하였습니다."

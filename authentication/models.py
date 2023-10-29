@@ -19,7 +19,7 @@ class UserManager(BaseUserManager):
         user.save()
         return user 
     
-    def create_superuser(self,email,name="lim",gender="남자",birth="1999-08-22",password=None):
+    def create_superuser(self,email,password,name="lim",gender="남자",birth="1999-08-22"):
         user = self.create_user(
             email = self.normalize_email(email), # 이메일 정규화 
             name = name,
@@ -33,7 +33,6 @@ class UserManager(BaseUserManager):
         return user
 
 class User(AbstractBaseUser):
-    # id와 password만 AbstractBaseUser에 존재 
     email = models.CharField(primary_key=True, max_length=50) 
     name = models.CharField(max_length=50)
     birth = models.DateField()

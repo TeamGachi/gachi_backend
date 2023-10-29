@@ -2,7 +2,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import generics,status
-from .models import User
 from .serializer import SignUpSerializer,LoginSerializer
 from django.contrib.auth import authenticate
 from config import *
@@ -11,10 +10,11 @@ import requests
 
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
+
     def post(self,request):
-        serializer = self.get_serializer(data=request.data) # genericAPIview의 get_serializer를 통해 시리얼라이저 지정
-        if serializer.is_valid(raise_exception=True): # login 데이터가 유효한지 검사하기 위해 validate메소드 실행
-            user = authenticate( # basic authentication model을 활용하여 인증 
+        serializer = self.get_serializer(data=request.data) 
+        if serializer.is_valid(raise_exception=True): 
+            user = authenticate( 
                 request,
                 email = serializer.validated_data['email'],
                 password = serializer.validated_data['password']
@@ -25,11 +25,16 @@ class LoginView(generics.GenericAPIView):
                     'refresh': str(refreshtoken),
                     'access': str(refreshtoken.access_token),
                 })
+            else:
+                return Response(data={"message" : "해당 유저가 존재하지 않습니다." },
+                                status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"message" : "유효하지 않은 정보입니다." },
+                            status=status.HTTP_400_BAD_REQUEST)
         
 # 카카오 로그인 API 
 class KakaoLoginView(APIView):
+
     def get(self,request):
         '''
             카카오 인가코드 요청
@@ -43,6 +48,7 @@ class KakaoLoginView(APIView):
 
 # Kakao Authentication Redirection View , 인가 token 발급 요청 
 class KakaoLoginCallbackView(APIView):
+
     def get(self,request):
         data = request.query_params.copy()
         code = data.get('code')
@@ -66,13 +72,15 @@ class KakaoLoginCallbackView(APIView):
 
 # 로그아웃      
 class LogoutView(APIView):
+    
     def get(self,request):
         return Response(status=200)
     
 # 회원가입 
 class SignUpView(generics.CreateAPIView):
-    queryset = User.objects.all()
     serializer_class = SignUpSerializer
+
+
 
 
 

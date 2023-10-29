@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'authentication',
     'friend',
     'image',
-    'trip'
+    'trip',
+    # Thrid Party
+    'django_extensions'
 ]
 
 MIDDLEWARE = [
@@ -168,3 +170,19 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': datetime.timedelta(days=1),
 }
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+        },
+    },
+}

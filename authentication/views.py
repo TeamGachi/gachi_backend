@@ -1,12 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics,status
-from .serializer import SignUpSerializer,LoginSerializer
+from .serializer import SignUpSerializer,LoginSerializer,WithDrawSerializer
 from django.contrib.auth import authenticate
 from config import *
 from django.shortcuts import redirect
+from rest_framework_simplejwt.authentication import JWTAuthentication
 import requests
+
 
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
@@ -32,7 +35,7 @@ class LoginView(generics.GenericAPIView):
             return Response(data={"message" : "유효하지 않은 정보입니다." },
                             status=status.HTTP_400_BAD_REQUEST)
         
-# 카카오 로그인 API 
+
 class KakaoLoginView(APIView):
 
     def get(self,request):
@@ -46,7 +49,7 @@ class KakaoLoginView(APIView):
         res = redirect(uri)
         return res
 
-# Kakao Authentication Redirection View , 인가 token 발급 요청 
+
 class KakaoLoginCallbackView(APIView):
 
     def get(self,request):
@@ -70,17 +73,25 @@ class KakaoLoginCallbackView(APIView):
         token_res = requests.post(kakao_token_api,data=request_data,headers=token_headers).json()        
         return Response(status=status.HTTP_200_OK)
 
-# 로그아웃      
+    
 class LogoutView(APIView):
     
     def get(self,request):
         return Response(status=200)
     
-# 회원가입 
+
 class SignUpView(generics.CreateAPIView):
     serializer_class = SignUpSerializer
 
+class WithDrawView(generics.DestroyAPIView):
+    '''
+    회원탈퇴 View 
+    /api/authentication/withdraw/?{email}
+    '''
 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated] 
+    serializer_class = WithDrawSerializer
 
 
 

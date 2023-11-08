@@ -3,11 +3,13 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics,status
-from .serializer import SignUpSerializer,LoginSerializer,WithDrawSerializer
+from .serializer import SignUpSerializer,LoginSerializer
 from django.contrib.auth import authenticate
-from config import *
+from django.shortcuts import get_object_or_404
+from config import KAKAO
 from django.shortcuts import redirect
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from .models import User
 import requests
 
 
@@ -75,23 +77,26 @@ class KakaoLoginCallbackView(APIView):
 
     
 class LogoutView(APIView):
-    
     def get(self,request):
-        return Response(status=200)
+        return Response({"message":"로그아웃되었습니다."},status=200)
     
 
 class SignUpView(generics.CreateAPIView):
     serializer_class = SignUpSerializer
 
-class WithDrawView(generics.DestroyAPIView):
+class WithDrawView(APIView):
     '''
     회원탈퇴 View 
-    /api/authentication/withdraw/?{email}
+    /api/authentication/withdraw/
     '''
-
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated] 
-    serializer_class = WithDrawSerializer
-
+    
+    def delete(self,request,*args,**kwargs):
+        try:
+            request.user.delete()
+        except:
+            return Response({"message":"회원탈퇴에 실패하였습니다."},status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"message":"성공적으로 탈퇴했습니다."},status.HTTP_202_ACCEPTED)
 
 

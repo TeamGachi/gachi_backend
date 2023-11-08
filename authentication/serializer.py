@@ -70,3 +70,10 @@ class WithDrawSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = "__all__"
+
+    def validate(self, data):
+        print(data)
+        return data
+
+
+        

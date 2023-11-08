@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from rest_framework.exceptions import PermissionDenied, NotAuthenticated
+from rest_framework.exceptions import PermissionDenied,NotAuthenticated
 from trip.models import Trip
 
 class TripMembersOnly(BasePermission):

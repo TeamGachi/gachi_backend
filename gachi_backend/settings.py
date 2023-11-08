@@ -24,7 +24,7 @@ SECRET_KEY = ENV['SECRETKEY']
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 

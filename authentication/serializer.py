@@ -65,3 +65,15 @@ class LoginSerializer(serializers.Serializer):
             {"message":"비밀번호의 길이가 6이하 혹은 20이상입니다."}
         )
 
+class WithDrawSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = "__all__"
+
+    def validate(self, data):
+        print(data)
+        return data
+
+
+        

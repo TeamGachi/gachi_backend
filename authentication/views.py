@@ -1,12 +1,17 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics,status
 from .serializer import SignUpSerializer,LoginSerializer
 from django.contrib.auth import authenticate
-from config import *
+from django.shortcuts import get_object_or_404
+from config import KAKAO
 from django.shortcuts import redirect
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from .models import User
 import requests
+
 
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
@@ -32,7 +37,7 @@ class LoginView(generics.GenericAPIView):
             return Response(data={"message" : "유효하지 않은 정보입니다." },
                             status=status.HTTP_400_BAD_REQUEST)
         
-# 카카오 로그인 API 
+
 class KakaoLoginView(APIView):
 
     def get(self,request):
@@ -46,7 +51,7 @@ class KakaoLoginView(APIView):
         res = redirect(uri)
         return res
 
-# Kakao Authentication Redirection View , 인가 token 발급 요청 
+
 class KakaoLoginCallbackView(APIView):
 
     def get(self,request):
@@ -70,17 +75,28 @@ class KakaoLoginCallbackView(APIView):
         token_res = requests.post(kakao_token_api,data=request_data,headers=token_headers).json()        
         return Response(status=status.HTTP_200_OK)
 
-# 로그아웃      
+    
 class LogoutView(APIView):
-    
     def get(self,request):
-        return Response(status=200)
+        return Response({"message":"로그아웃되었습니다."},status=200)
     
-# 회원가입 
+
 class SignUpView(generics.CreateAPIView):
     serializer_class = SignUpSerializer
 
-
-
+class WithDrawView(APIView):
+    '''
+    회원탈퇴 View 
+    /api/authentication/withdraw/
+    '''
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated] 
+    
+    def delete(self,request,*args,**kwargs):
+        try:
+            request.user.delete()
+        except:
+            return Response({"message":"회원탈퇴에 실패하였습니다."},status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"message":"성공적으로 탈퇴했습니다."},status.HTTP_202_ACCEPTED)
 
 

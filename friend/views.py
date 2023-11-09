@@ -51,11 +51,9 @@ class FriendshipRequestHandleView(generics.UpdateAPIView):
         '''
             친구요청 승낙 및 거절
         '''
-        try:
-            action = request.data['action']
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        data = {"message":""}
+        message = {"message":""}
+        action = request.data.get('action')
+        
         if action == "accept":
             friendship_request = get_object_or_404(FriendshipRequest,id=kwargs['pk'])
             sender = friendship_request.sender
@@ -65,13 +63,14 @@ class FriendshipRequestHandleView(generics.UpdateAPIView):
             friendship2 = Friend(user=recevier,friend=sender)
             friendship2.save()
             friendship_request.delete()
-            data["message"] = "친구요청을 수락하였습니다."
+            message["message"] = "친구요청을 수락하였습니다."
         elif action == "reject":
             friendship = get_object_or_404(FriendshipRequest,id=kwargs['pk'])
             friendship.delete()
-            data["message"] = "친구요청을 거절하였습니다."
+            message["message"] = "친구요청을 거절하였습니다."
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(data=data,status=status.HTTP_200_OK)
+            message["message"] = "올바르지 않은 action을 입력하였습니다. "
+            return Response(message,status.HTTP_400_BAD_REQUEST)
+        return Response(message,status.HTTP_200_OK)
 
 

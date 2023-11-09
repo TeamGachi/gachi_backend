@@ -7,5 +7,7 @@ class TripImageSerializer(serializers.ModelSerializer):
         model = TripImage
         fields = "__all__"
 
+    def validate(self, attrs):
+        
 
-    
+        return super().validate(attrs)

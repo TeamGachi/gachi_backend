@@ -11,6 +11,7 @@ from django.shortcuts import redirect
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import User
 import requests
+import json 
 
 
 class LoginView(generics.GenericAPIView):
@@ -56,15 +57,16 @@ class KakaoLoginCallbackView(APIView):
 
     def get(self,request):
         data = request.query_params.copy()
-        code = data.get('code')
-        if not code:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        code = data.get('code',None)
+        if code is None:
+            return Response({"message":"해당 코드가 존재하지 않습니다."},
+                            status.HTTP_400_BAD_REQUEST)
 
         request_data = {
             "grant_type" : "authorization_code",
-            "cliend_id" : KAKAO["REST_API_KEY"],
+            "client_id" : KAKAO["REST_API_KEY"],
             "redirection_uri" : "http://localhost:8000/api/authentication/login/kakao/callback/",
-            'client_secret': KAKAO['KAKAO_CLIENT_SECRET_KEY'],
+            #'client_secret': KAKAO['KAKAO_CLIENT_SECRET_KEY'],
             "code" : code
         }
         token_headers = {
@@ -72,13 +74,17 @@ class KakaoLoginCallbackView(APIView):
         }
      
         kakao_token_api = "https://kauth.kakao.com/oauth/token"
-        token_res = requests.post(kakao_token_api,data=request_data,headers=token_headers).json()        
-        return Response(status=status.HTTP_200_OK)
+        token_res = requests.post(kakao_token_api,headers=token_headers,data=request_data).json()
+
+        access_token = token_res["access_token"]
+        
+
+        return Response({"message":f"{token_res}"},status.HTTP_200_OK)
 
     
 class LogoutView(APIView):
     def get(self,request):
-        return Response({"message":"로그아웃되었습니다."},status=200)
+        return Response({"message":"로그아웃되었습니다."},status.HTTP_200_OK)
     
 
 class SignUpView(generics.CreateAPIView):

@@ -35,7 +35,7 @@ class TripView(generics.ListCreateAPIView):
         return Response(data=serializer.data,status=status.HTTP_201_CREATED)
     
 
-class TripUpdateView(generics.UpdateAPIView):
+class TripUpdateView(generics.RetrieveUpdateAPIView):
     '''
         /api/trip/<int:pk>/
         PK 여행 레코드에서 User를 제외 (여행탈퇴)

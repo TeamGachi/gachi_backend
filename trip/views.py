@@ -32,7 +32,7 @@ class TripView(generics.ListCreateAPIView):
         else:
             return Response(data={"message" : "유효하지 않은 정보입니다."},
                             status=status.HTTP_400_BAD_REQUEST)
-        return Response(data=serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.data,status.HTTP_201_CREATED)
     
 
 class TripUpdateView(generics.RetrieveUpdateAPIView):
@@ -54,10 +54,10 @@ class TripUpdateView(generics.RetrieveUpdateAPIView):
             if trip.users.count()==0:
                 trip.delete()
             return Response({"message" : "여행에서 User가 제거되었습니다."},
-                            status=status.HTTP_200_OK)
+                            status.HTTP_200_OK)
         else:
             return Response({"message" : "올바르지 않은 입력입니다."},
-                            status=status.HTTP_400_BAD_REQUEST)
+                            status.HTTP_400_BAD_REQUEST)
 
 
 

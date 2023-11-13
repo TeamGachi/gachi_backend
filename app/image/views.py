@@ -8,7 +8,6 @@ from django.shortcuts import get_object_or_404
 from permissions import TripMembersOnly
 from .task import *
 from authentication.models import User
-import time
 
 
 class ImageCreateView(generics.CreateAPIView):

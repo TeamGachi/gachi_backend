@@ -1,0 +1,42 @@
+version: "3.9"
+   
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    networks:
+      - network
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+    - 5432:5432
+  nginx:
+    hostname: nginx
+    build: ./nginx/
+    ports: 
+    - "80:80"
+    depends_on:
+      - backend
+    networks:
+    - network
+    
+  backend:
+    build: ./gachi_backend/
+    command: gunicorn --bind 0.0.0.0:8000 gachi_backend.wsgi:application
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    networks:
+    - network
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+networks:
+  network:

@@ -9,7 +9,6 @@ from django.shortcuts import get_object_or_404
 from .models import Trip, TripInvite
 from permissions import TripMembersOnly
 
-
 class TripView(generics.ListCreateAPIView):
     """
     GET POST

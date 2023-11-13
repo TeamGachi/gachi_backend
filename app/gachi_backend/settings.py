@@ -22,7 +22,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 SECRET_KEY = ENV["SECRETKEY"]
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -47,9 +47,12 @@ INSTALLED_APPS = [
     # Thrid Party
     "django_extensions",
     "drf_spectacular",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

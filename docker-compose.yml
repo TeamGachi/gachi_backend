@@ -24,7 +24,7 @@ services:
     - network
     
   backend:
-    build: ./gachi_backend/
+    build: ./app/
     command: gunicorn --bind 0.0.0.0:8000 gachi_backend.wsgi:application
     volumes:
       - .:/code

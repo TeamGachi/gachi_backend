@@ -1,5 +1,5 @@
 version: "3.9"
-   
+
 services:
   db:
     image: postgres
@@ -12,31 +12,42 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-    - 5432:5432
+      - "5432:5432"
   nginx:
+    platform: linux/amd64
+    image: limjung99/nginx
     hostname: nginx
     build: ./nginx/
-    ports: 
-    - "80:80"
+    ports:
+      - "80:80"
     depends_on:
       - backend
     networks:
-    - network
-    
+      - network
+
   backend:
+    platform: linux/amd64
+    image: limjung99/gachi
     build: ./app/
-    command: gunicorn --bind 0.0.0.0:8000 gachi_backend.wsgi:application
     volumes:
       - .:/code
     ports:
       - "8000:8000"
     networks:
-    - network
+      - network
     environment:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     depends_on:
       - db
+    command:  sh -c "
+            python manage.py makemigrations authentication&&
+            python manage.py makemigrations friend&&
+            python manage.py makemigrations image&&
+            python manage.py makemigrations trip&&
+            python manage.py migrate&&
+            gunicorn --bind 0.0.0.0:8000 gachi_backend.wsgi:application"
+
 networks:
   network:

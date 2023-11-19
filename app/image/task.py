@@ -8,17 +8,21 @@ def get_user_included_images(user, queryset):
     """
     user_included_images = []
     user_image = face_recognition.load_image_file(user.face_image)
+
     for trip_image in queryset:
         unknown_image = face_recognition.load_image_file(trip_image.image)
+
         try:
+            # user_image에서 얼굴을 못찾으면 exception발생
             user_face_encoding = face_recognition.face_encodings(
                 user_image, num_jitters=100
             )[0]
+
             unknown_face_encodings = face_recognition.face_encodings(
                 unknown_image, num_jitters=100
             )
-        except IndexError:
-            return "error"
+        except IndexError:  
+            raise IndexError
 
         known_faces = [user_face_encoding]
 

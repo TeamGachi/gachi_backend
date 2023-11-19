@@ -1,13 +1,13 @@
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.permissions import IsAuthenticated
-from .serializer import TripSerializer, TripInviteSerializer
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import generics
 from django.shortcuts import get_object_or_404
-from .models import Trip, TripInvite
 from permissions import TripMembersOnly
+from rest_framework import generics, status, views
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+from .models import Trip, TripInvite
+from .serializer import TripInviteSerializer, TripSerializer
+
 
 class TripView(generics.ListCreateAPIView):
     """
@@ -45,6 +45,12 @@ class TripUpdateView(generics.RetrieveUpdateAPIView):
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [TripMembersOnly]
+    serializer_class = TripSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = Trip.objects.get(id=kwargs["pk"])
+        serializer = self.get_serializer(queryset)
+        return Response(serializer.data, status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         action = request.data.get("action")
@@ -74,6 +80,21 @@ class TripInviteView(generics.ListCreateAPIView):
     def get_queryset(self):
         queryset = TripInvite.objects.filter(receiver=self.request.user)
         return queryset
+
+
+class TripMemoView(views.APIView):
+    """
+    PATCH
+    Trip의 메모를 수정
+    /api/trip/<int:pk>/memo/
+    """
+
+    def patch(self, request, id):
+        adding_memo = request.data.get("memo")
+        trip = get_object_or_404(Trip, id=id)
+        trip.memo += adding_memo
+        trip.save()
+        return Response({"message": "정상적으로 메모가 수저되었습니다."}, status.HTTP_200_OK)
 
 
 class TrpInviteUpdateView(generics.UpdateAPIView):

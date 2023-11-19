@@ -31,7 +31,8 @@ class LoginView(generics.GenericAPIView):
                     {
                         "refresh": str(refreshtoken),
                         "access": str(refreshtoken.access_token),
-                    }
+                    },
+                
                 )
             else:
                 return Response(

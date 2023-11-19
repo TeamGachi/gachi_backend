@@ -10,3 +10,6 @@ class TripImageSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         return super().validate(attrs)
+
+class FaceImageSerializer(serializers.Serializer):
+    face_image = serializers.ImageField(use_url=True)

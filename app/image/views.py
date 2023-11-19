@@ -1,8 +1,9 @@
 from rest_framework.response import Response
+from django.http import FileResponse
 from rest_framework import status
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import generics
-from .serializer import TripImageSerializer
+from .serializer import TripImageSerializer, FaceImageSerializer
 from .models import TripImage
 from django.shortcuts import get_object_or_404
 from permissions import TripMembersOnly
@@ -17,8 +18,8 @@ class ImageCreateView(generics.CreateAPIView):
     TripImage생성 VIEW
     """
 
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [TripMembersOnly]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [TripMembersOnly]
     serializer_class = TripImageSerializer
 
     def get(self, request):
@@ -34,7 +35,14 @@ class ImageCreateView(generics.CreateAPIView):
                 {"message": "이메일 쿼리스트링을 넣어주세요"}, status.HTTP_400_BAD_REQUEST
             )
         user = get_object_or_404(User, email=email)
-        return Response(user.face_image, status.HTTP_200_OK)
+        serializer = FaceImageSerializer(user)
+        return Response(serializer.data)
+        if user.face_image:
+            image_path = user.face_image.path
+            with open(image_path, "rb") as image_file:
+                return FileResponse(image_file, content_type="image/jpeg")
+        else:
+            return Response({"message": "얼굴 이미지가 없습니다."}, status.HTTP_404_NOT_FOUND)
 
 
 class ImageListView(generics.ListAPIView):
@@ -44,8 +52,8 @@ class ImageListView(generics.ListAPIView):
     Trip중 PK를 가지고 있는 Trip에 속하는 모든 이미지 조회 요청 VIEW
     """
 
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [TripMembersOnly]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [TripMembersOnly]
     serializer_class = TripImageSerializer
 
     def get_queryset(self):
@@ -61,6 +69,12 @@ class ImageListView(generics.ListAPIView):
         else:
             queryset = self.get_queryset()
             user = get_object_or_404(User, email=email)
-            result = get_user_included_images(user, queryset)
+            try:
+                result = get_user_included_images(user, queryset)
+            except IndexError:
+                return Response(
+                    {"message": "유저의 아이디에 등록된 사진에 얼굴이 들어있지 않습니다."},
+                    status.HTTP_400_BAD_REQUEST,
+                )
             serializer = self.get_serializer(result, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)

@@ -1,4 +1,5 @@
 from rest_framework.serializers import ModelSerializer
+from django.shortcuts import get_object_or_404
 from .models import *
 from friend.models import Friend
 from rest_framework import serializers
@@ -39,13 +40,21 @@ class TripInviteSerializer(ModelSerializer):
                 {"error": "친구 관계가 아닌 사람에게는 여행 초대를 보낼 수 없습니다."}
             )
 
-        trip_id = data["trip"]
-
-        try:
-            trip = Trip.objects.get(id=trip_id)
-        except Trip.DoesNotExist:
+        if data["trip"] is None:
             raise serializers.ValidationError(
-                {"message": "존재하지 않는 여행에 대해 초대 요청을 보낼 수 없습니다."}
+                {"error": "존재하지 않는 여행에 대해서 여행 초대를 보낼 수 없습니다."}
             )
 
-        return data
+        try:
+            trip_invite_1 = TripInvite.objects.get(
+                sender=data["sender"], receiver=data["receiver"]
+            )
+            raise serializers.ValidationError({"error": "이미 요청이 존재합니다."})
+        except TripInvite.DoesNotExist:
+            try:
+                trip_invite_2 = TripInvite.objects.get(
+                    sender=data["receiver"], receiver=data["sender"]
+                )
+                raise serializers.ValidationError({"error": "이미 요청이 존재합니다."})
+            except TripInvite.DoesNotExist:
+                return data

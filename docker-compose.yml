@@ -11,8 +11,6 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    ports:
-      - "5432:5432"
   nginx:
     platform: linux/amd64
     image: limjung99/nginx
@@ -31,8 +29,6 @@ services:
     build: ./app/
     volumes:
       - .:/code
-    ports:
-      - "8000:8000"
     networks:
       - network
     environment:

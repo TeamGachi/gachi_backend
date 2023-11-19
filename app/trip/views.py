@@ -90,9 +90,9 @@ class TripMemoView(views.APIView):
     """
 
     def patch(self, request, id):
-        adding_memo = request.data.get("memo")
+        patch_memo = request.data.get("memo")
         trip = get_object_or_404(Trip, id=id)
-        trip.memo += adding_memo
+        trip.memo = patch_memo
         trip.save()
         return Response({"message": "정상적으로 메모가 수저되었습니다."}, status.HTTP_200_OK)
 
